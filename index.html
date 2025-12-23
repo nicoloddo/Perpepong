@@ -26,8 +26,8 @@
         header {
             text-align: center;
             color: white;
-            margin-bottom: 40px;
-            padding: 30px 20px;
+            margin-bottom: 30px;
+            padding: 30px 20px 20px;
         }
 
         h1 {
@@ -39,6 +39,51 @@
         .subtitle {
             font-size: 1.2em;
             opacity: 0.9;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+            color: #667eea;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
         }
 
         .stats-grid {
@@ -54,6 +99,12 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         .stat-number {
@@ -69,7 +120,7 @@
             text-transform: uppercase;
         }
 
-        .players-section {
+        .content-section {
             background: white;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -84,10 +135,11 @@
             font-weight: bold;
         }
 
-        .players-list {
+        .content-body {
             padding: 0;
         }
 
+        /* Player Rows */
         .player-row {
             display: flex;
             align-items: center;
@@ -152,6 +204,244 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        /* Match Rows */
+        .match-row {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .match-row:hover {
+            background-color: #f5f5f5;
+        }
+
+        .match-row:last-child {
+            border-bottom: none;
+        }
+
+        .match-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .match-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .match-players {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.2em;
+        }
+
+        .match-player {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .match-player.winner {
+            color: #667eea;
+        }
+
+        .match-score {
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 1.3em;
+        }
+
+        .match-elo-changes {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .elo-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .elo-change.positive {
+            color: #22c55e;
+        }
+
+        .elo-change.negative {
+            color: #ef4444;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .match-detail-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .match-detail-score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .calculation-section {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .calculation-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calculation-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .calculation-row:last-child {
+            border-bottom: none;
+        }
+
+        .calculation-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .calculation-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .player-calculation {
+            margin-bottom: 30px;
+        }
+
+        .player-calculation-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .formula-box {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            color: #333;
+        }
+
+        .highlight-positive {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .highlight-negative {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .highlight-neutral {
+            color: #667eea;
+            font-weight: bold;
+        }
+
         .loading {
             text-align: center;
             color: white;
@@ -164,13 +454,18 @@
             color: white;
             padding: 20px;
             border-radius: 8px;
-            margin: 20px 0;
+            margin: 20px;
             text-align: center;
         }
 
         @media (max-width: 768px) {
             h1 {
                 font-size: 2em;
+            }
+
+            .nav-btn {
+                padding: 12px 20px;
+                font-size: 1em;
             }
 
             .player-row {
@@ -191,6 +486,21 @@
                 margin-top: 10px;
                 width: 100%;
             }
+
+            .match-players {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -201,16 +511,67 @@
             <p class="subtitle">Sistema di Rating ELO</p>
         </header>
 
-        <div class="stats-grid" id="statsGrid">
-            <!-- Le statistiche verranno inserite qui -->
+        <nav>
+            <button class="nav-btn active" onclick="mostraPagina('classifica')">
+                🏆 Classifica
+            </button>
+            <button class="nav-btn" onclick="mostraPagina('partite')">
+                ⚔️ Partite
+            </button>
+            <button class="nav-btn" onclick="mostraPagina('statistiche')">
+                📊 Statistiche
+            </button>
+        </nav>
+
+        <!-- Pagina Classifica -->
+        <div id="page-classifica" class="page active">
+            <div class="content-section">
+                <div class="section-header">
+                    Classifica Giocatori
+                </div>
+                <div class="content-body" id="playersList">
+                    <div class="loading">Caricamento dati...</div>
+                </div>
+            </div>
         </div>
 
-        <div class="players-section">
-            <div class="section-header">
-                Classifica Giocatori
+        <!-- Pagina Partite -->
+        <div id="page-partite" class="page">
+            <div class="content-section">
+                <div class="section-header">
+                    Storico Partite
+                </div>
+                <div class="content-body" id="matchesList">
+                    <div class="loading">Caricamento partite...</div>
+                </div>
             </div>
-            <div class="players-list" id="playersList">
-                <div class="loading">Caricamento dati...</div>
+        </div>
+
+        <!-- Pagina Statistiche -->
+        <div id="page-statistiche" class="page">
+            <div class="stats-grid" id="statsGrid">
+                <!-- Le statistiche verranno inserite qui -->
+            </div>
+            <div class="content-section">
+                <div class="section-header">
+                    Analisi Dettagliata
+                </div>
+                <div class="content-body" id="detailedStats">
+                    <div class="loading">Caricamento statistiche...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per dettagli partita -->
+    <div id="matchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Dettaglio Calcolo ELO</div>
+                <button class="close-btn" onclick="chiudiModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Il contenuto verrà inserito dinamicamente -->
             </div>
         </div>
     </div>

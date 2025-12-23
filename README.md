@@ -6,9 +6,65 @@ Un'applicazione web per tracciare e visualizzare le classifiche dei giocatori ba
 
 - **Sistema ELO Avanzato**: Calcolo del rating basato sul sistema ELO degli scacchi
 - **Fattore Differenza Punti**: Il margine di vittoria influenza il cambio di rating
+- **Multi-pagina**: Navigazione tra Classifica, Partite e Statistiche
+- **Dettaglio Calcoli**: Clicca su una partita per vedere come è stato calcolato l'ELO
+- **Spiegazioni User-Friendly**: Capire facilmente perché l'ELO è cambiato
 - **Statistiche Dettagliate**: Visualizzazione di vittorie, sconfitte, punti segnati per ogni giocatore
 - **Design Moderno**: Interfaccia responsive e accattivante
 - **Tutto in Italiano**: Interfaccia completamente localizzata
+
+## 📱 Sezioni dell'Applicazione
+
+### 🏆 Classifica
+Visualizza tutti i giocatori ordinati per ELO con:
+- Posizione in classifica (medaglie per i primi 3)
+- Rating ELO corrente
+- Statistiche complete (partite, vittorie, sconfitte, percentuali)
+- Punti totali segnati
+
+### ⚔️ Partite
+Storico completo di tutte le partite con:
+- Numero progressivo della partita
+- Risultato e punteggio
+- Cambi di ELO per entrambi i giocatori
+- **Clicca su una partita** per vedere il calcolo dettagliato dell'ELO!
+
+### 📊 Statistiche
+Dashboard completa con:
+- Numero giocatori, partite totali
+- ELO medio, massimo e minimo
+- Punti medi per partita
+- Record e primati (più partite, più vittorie, miglior percentuale, ecc.)
+
+## 🔍 Dettaglio Calcolo ELO (Novità!)
+
+Cliccando su qualsiasi partita nella sezione "Partite", si apre una finestra modale che mostra:
+
+### Per ogni giocatore:
+1. **Situazione Iniziale**
+   - ELO iniziale e dell'avversario
+   - Differenza di ELO
+   
+2. **Probabilità di Vittoria**
+   - Probabilità calcolata in base alla differenza di ELO
+   - Formula matematica visualizzata
+   - Spiegazione se era favorito o sfavorito
+   
+3. **Impatto della Differenza Punti**
+   - Differenza di punteggio nella partita
+   - Fattore moltiplicativo applicato
+   - Spiegazione dell'impatto (equilibrata, moderata, schiacciante)
+   
+4. **Calcolo Finale**
+   - Cambio ELO base (senza fattore differenza)
+   - Cambio ELO finale (con fattore differenza)
+   - Formula completa del calcolo
+   - **Spiegazione in parole semplici** del perché l'ELO è cambiato di quella quantità
+
+### Esempio di Spiegazione
+> "Eri lo sfavorito (ELO inferiore di 150), quindi questa vittoria vale molto! Il margine di 8 punti dimostra una vittoria dominante, quindi guadagni +45 punti ELO."
+
+Questo aiuta a capire l'impatto sia del **risultato** (vittoria/sconfitta) che del **margine** (differenza punti).
 
 ## 📁 Formato Dati
 
@@ -107,17 +163,33 @@ Per ogni giocatore viene mostrato:
 ## 🛠️ Struttura del Codice
 
 ### `index.html`
-File principale con la struttura HTML e gli stili CSS.
+File principale con:
+- Struttura HTML multi-pagina (SPA)
+- Stili CSS completi
+- Navigazione tra sezioni
+- Modal per dettaglio partite
 
 ### `elo.js`
 Contiene tutta la logica JavaScript:
 
-- `calcolaElo()`: Funzione isolata per il calcolo del rating ELO
+#### Funzioni Core
+- `calcolaElo()`: Funzione isolata per il calcolo del rating ELO con dettagli completi
 - `analizzaRiga()`: Parser per il formato del file matches.txt
 - `caricaPartite()`: Carica e processa il file matches.txt
-- `calcolaClassifica()`: Calcola gli ELO di tutti i giocatori
-- `visualizzaStatistiche()`: Mostra le statistiche globali
+- `calcolaClassifica()`: Calcola gli ELO di tutti i giocatori e memorizza i dettagli di ogni partita
+
+#### Funzioni di Visualizzazione
 - `visualizzaClassifica()`: Renderizza la classifica dei giocatori
+- `visualizzaPartite()`: Mostra lo storico delle partite
+- `visualizzaStatistiche()`: Mostra le statistiche globali
+- `visualizzaStatisticheDettagliate()`: Mostra analisi e record
+
+#### Funzioni Interattive
+- `mostraPagina()`: Gestisce la navigazione tra pagine
+- `mostraDettaglioPartita()`: Apre il modal con i dettagli del calcolo ELO
+- `generaCalcoloGiocatore()`: Genera la visualizzazione dettagliata del calcolo per un giocatore
+- `spiegaCambioElo()`: Crea spiegazioni user-friendly dei cambi di ELO
+- `chiudiModal()`: Chiude il modal dei dettagli
 
 ### `matches.txt`
 File di dati contenente lo storico delle partite.
