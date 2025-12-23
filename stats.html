@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiche - Perpeponghieri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            padding: 12px 30px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        nav a:hover {
+            background: #f0f0f0;
+        }
+
+        nav a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .stat-description {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .top-players {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .top-player-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .top-player-item:last-child {
+            border-bottom: none;
+        }
+
+        .top-player-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 60px;
+        }
+
+        .top-player-info {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .top-player-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .top-player-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            padding: 50px;
+        }
+
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-number {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏓 Classifica Perpeponghieri</h1>
+            <p class="subtitle">Sistema di Rating ELO</p>
+        </header>
+
+        <nav>
+            <a href="index.html">Classifica</a>
+            <a href="matches.html">Partite</a>
+            <a href="stats.html" class="active">Statistiche</a>
+        </nav>
+
+        <div class="loading" id="loading">Caricamento statistiche...</div>
+        
+        <div id="statsContent" style="display: none;">
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <div class="top-players">
+                <div class="section-header">🏆 Miglior ELO Raggiunto</div>
+                <div id="topEloPlayers"></div>
+            </div>
+
+            <div class="top-players">
+                <div class="section-header">🎯 Più Partite Giocate</div>
+                <div id="topMatchesPlayers"></div>
+            </div>
+
+            <div class="top-players">
+                <div class="section-header">⚡ Percentuale Vittorie</div>
+                <div id="topWinRatePlayers"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="elo.js"></script>
+    <script>
+        async function inizializzaStatistiche() {
+            try {
+                const partite = await caricaPartite();
+                
+                if (partite.length === 0) {
+                    document.getElementById('loading').innerHTML = 
+                        '<div class="error">Nessuna partita trovata nel file matches.txt</div>';
+                    return;
+                }
+                
+                const classifica = calcolaClassifica(partite);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('statsContent').style.display = 'block';
+                
+                visualizzaStatisticheDettagliate(classifica, partite);
+                
+            } catch (error) {
+                document.getElementById('loading').innerHTML = 
+                    `<div class="error">Errore: ${error.message}</div>`;
+            }
+        }
+
+        function visualizzaStatisticheDettagliate(classifica, partite) {
+            // Statistiche generali
+            const statsGrid = document.getElementById('statsGrid');
+            
+            const mediaElo = Math.round(
+                classifica.reduce((sum, g) => sum + g.elo, 0) / classifica.length
+            );
+            
+            const maxElo = Math.max(...classifica.map(g => g.elo));
+            const minElo = Math.min(...classifica.map(g => g.elo));
+            
+            const totalePartite = partite.length;
+            const numeroGiocatori = classifica.length;
+            
+            const mediaPartitePerGiocatore = Math.round(
+                classifica.reduce((sum, g) => sum + g.partiteGiocate, 0) / classifica.length
+            );
+            
+            const totalePuntiSegnati = classifica.reduce((sum, g) => sum + g.puntiSegnati, 0);
+            const mediaPuntiPerPartita = Math.round(totalePuntiSegnati / (totalePartite * 2));
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${numeroGiocatori}</div>
+                    <div class="stat-label">Giocatori Totali</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${totalePartite}</div>
+                    <div class="stat-label">Partite Giocate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${mediaElo}</div>
+                    <div class="stat-label">ELO Medio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${maxElo}</div>
+                    <div class="stat-label">ELO Massimo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${minElo}</div>
+                    <div class="stat-label">ELO Minimo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${mediaPartitePerGiocatore}</div>
+                    <div class="stat-label">Media Partite/Giocatore</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${mediaPuntiPerPartita}</div>
+                    <div class="stat-label">Media Punti/Partita</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${totalePuntiSegnati}</div>
+                    <div class="stat-label">Punti Totali Segnati</div>
+                </div>
+            `;
+            
+            // Top ELO
+            const topElo = [...classifica].sort((a, b) => b.elo - a.elo).slice(0, 5);
+            document.getElementById('topEloPlayers').innerHTML = topElo.map((player, index) => `
+                <div class="top-player-item">
+                    <div class="top-player-rank">${index + 1}°</div>
+                    <div class="top-player-info">
+                        <div class="top-player-name">${player.nome}</div>
+                    </div>
+                    <div class="top-player-value">${player.elo}</div>
+                </div>
+            `).join('');
+            
+            // Più partite giocate
+            const topMatches = [...classifica].sort((a, b) => b.partiteGiocate - a.partiteGiocate).slice(0, 5);
+            document.getElementById('topMatchesPlayers').innerHTML = topMatches.map((player, index) => `
+                <div class="top-player-item">
+                    <div class="top-player-rank">${index + 1}°</div>
+                    <div class="top-player-info">
+                        <div class="top-player-name">${player.nome}</div>
+                    </div>
+                    <div class="top-player-value">${player.partiteGiocate}</div>
+                </div>
+            `).join('');
+            
+            // Percentuale vittorie (minimo 3 partite)
+            const topWinRate = [...classifica]
+                .filter(g => g.partiteGiocate >= 3)
+                .sort((a, b) => (b.vittorie / b.partiteGiocate) - (a.vittorie / a.partiteGiocate))
+                .slice(0, 5);
+            document.getElementById('topWinRatePlayers').innerHTML = topWinRate.map((player, index) => {
+                const winRate = ((player.vittorie / player.partiteGiocate) * 100).toFixed(1);
+                return `
+                    <div class="top-player-item">
+                        <div class="top-player-rank">${index + 1}°</div>
+                        <div class="top-player-info">
+                            <div class="top-player-name">${player.nome}</div>
+                        </div>
+                        <div class="top-player-value">${winRate}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', inizializzaStatistiche);
+    </script>
+</body>
+</html>
