@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partite - Perpeponghieri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            padding: 12px 30px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        nav a:hover {
+            background: #f0f0f0;
+        }
+
+        nav a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .matches-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .matches-list {
+            padding: 0;
+        }
+
+        .match-row {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .match-row:hover {
+            background-color: #f5f5f5;
+            transform: translateX(5px);
+        }
+
+        .match-row:last-child {
+            border-bottom: none;
+        }
+
+        .match-number {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #999;
+            min-width: 50px;
+        }
+
+        .match-info {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .match-players {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .winner {
+            color: #667eea;
+        }
+
+        .match-score {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            padding: 50px;
+        }
+
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .match-row {
+                flex-wrap: wrap;
+                padding: 15px;
+            }
+
+            .match-info {
+                margin-left: 10px;
+                flex: 1 1 100%;
+            }
+
+            .match-score {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏓 Classifica Perpeponghieri</h1>
+            <p class="subtitle">Sistema di Rating ELO</p>
+        </header>
+
+        <nav>
+            <a href="index.html">Classifica</a>
+            <a href="matches.html" class="active">Partite</a>
+            <a href="stats.html">Statistiche</a>
+        </nav>
+
+        <div class="matches-section">
+            <div class="section-header">
+                Tutte le Partite
+            </div>
+            <div class="matches-list" id="matchesList">
+                <div class="loading">Caricamento partite...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="elo.js"></script>
+    <script>
+        async function inizializzaPartite() {
+            try {
+                const partite = await caricaPartite();
+                
+                if (partite.length === 0) {
+                    document.getElementById('matchesList').innerHTML = 
+                        '<div class="error">Nessuna partita trovata nel file matches.txt</div>';
+                    return;
+                }
+                
+                visualizzaPartite(partite);
+                
+            } catch (error) {
+                document.getElementById('matchesList').innerHTML = 
+                    `<div class="error">Errore: ${error.message}</div>`;
+            }
+        }
+
+        function visualizzaPartite(partite) {
+            const matchesList = document.getElementById('matchesList');
+            
+            const html = partite.map((partita, index) => {
+                const numeroPartita = index + 1;
+                const winner = partita.punteggio1 > partita.punteggio2 ? partita.giocatore1 : partita.giocatore2;
+                const player1Class = partita.punteggio1 > partita.punteggio2 ? 'winner' : '';
+                const player2Class = partita.punteggio2 > partita.punteggio1 ? 'winner' : '';
+                
+                return `
+                    <div class="match-row" onclick="window.location.href='match-detail.html?match=${index}'">
+                        <div class="match-number">#${numeroPartita}</div>
+                        <div class="match-info">
+                            <div class="match-players">
+                                <span class="${player1Class}">${partita.giocatore1}</span>
+                                vs
+                                <span class="${player2Class}">${partita.giocatore2}</span>
+                            </div>
+                        </div>
+                        <div class="match-score">${partita.punteggio1} - ${partita.punteggio2}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            matchesList.innerHTML = html;
+        }
+
+        document.addEventListener('DOMContentLoaded', inizializzaPartite);
+    </script>
+</body>
+</html>

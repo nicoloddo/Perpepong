@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettaglio Partita - Perpeponghieri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            padding: 12px 30px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        nav a:hover {
+            background: #f0f0f0;
+        }
+
+        .back-button {
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: #f0f0f0;
+            transform: translateX(-5px);
+        }
+
+        .match-overview {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .match-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .match-vs {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .player-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .player-name {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .player-name.winner {
+            color: #667eea;
+        }
+
+        .player-score {
+            font-size: 4em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .vs-divider {
+            font-size: 2em;
+            color: #999;
+            font-weight: bold;
+        }
+
+        .calculation-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .calculation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .player-calculation {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            background: #f9f9f9;
+        }
+
+        .player-calculation.winner {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .calc-player-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .calc-step {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .calc-step-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .calc-step-value {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .calc-step-explanation {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .formula {
+            background: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .elo-change {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .elo-change-title {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .elo-change-value {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .elo-change-value.positive {
+            color: #4ade80;
+        }
+
+        .elo-change-value.negative {
+            color: #f87171;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .info-box-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .info-box-content {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            padding: 50px;
+        }
+
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .match-overview {
+                padding: 20px;
+            }
+
+            .player-score {
+                font-size: 3em;
+            }
+
+            .calculation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏓 Classifica Perpeponghieri</h1>
+            <p class="subtitle">Sistema di Rating ELO</p>
+        </header>
+
+        <nav>
+            <a href="index.html">Classifica</a>
+            <a href="matches.html">Partite</a>
+            <a href="stats.html">Statistiche</a>
+        </nav>
+
+        <a href="matches.html" class="back-button">← Torna alle partite</a>
+
+        <div id="loading" class="loading">Caricamento dettagli partita...</div>
+        <div id="matchContent" style="display: none;"></div>
+    </div>
+
+    <script src="elo.js"></script>
+    <script>
+        function calcolaDettagliElo(playerElo, opponentElo, playerScore, opponentScore, kFactor = 32) {
+            // Risultato della partita
+            const risultato = playerScore > opponentScore ? 1 : 0;
+            
+            // Punteggio atteso
+            const punteggioAtteso = 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
+            
+            // Differenza punti
+            const differenzaPunti = Math.abs(playerScore - opponentScore);
+            
+            // Fattore differenza
+            const fattoreDifferenza = 1 + (differenzaPunti / 20);
+            
+            // Cambio ELO
+            const cambioElo = kFactor * fattoreDifferenza * (risultato - punteggioAtteso);
+            const nuovoElo = playerElo + cambioElo;
+            
+            return {
+                risultato,
+                punteggioAtteso,
+                differenzaPunti,
+                fattoreDifferenza,
+                cambioElo,
+                nuovoElo: Math.round(nuovoElo)
+            };
+        }
+
+        async function inizializzaDettaglioPartita() {
+            try {
+                // Ottieni l'indice della partita dall'URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const matchIndex = parseInt(urlParams.get('match'));
+                
+                if (isNaN(matchIndex)) {
+                    throw new Error('Partita non specificata');
+                }
+                
+                const partite = await caricaPartite();
+                
+                if (matchIndex < 0 || matchIndex >= partite.length) {
+                    throw new Error('Partita non trovata');
+                }
+                
+                // Calcola gli ELO fino a questa partita
+                const classifica = calcolaClassificaFinoA(partite, matchIndex);
+                const partita = partite[matchIndex];
+                
+                const player1Elo = classifica[partita.giocatore1].elo;
+                const player2Elo = classifica[partita.giocatore2].elo;
+                
+                // Calcola i dettagli per entrambi i giocatori
+                const dettagli1 = calcolaDettagliElo(player1Elo, player2Elo, partita.punteggio1, partita.punteggio2);
+                const dettagli2 = calcolaDettagliElo(player2Elo, player1Elo, partita.punteggio2, partita.punteggio1);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('matchContent').style.display = 'block';
+                
+                visualizzaDettaglioPartita(partita, matchIndex, player1Elo, player2Elo, dettagli1, dettagli2);
+                
+            } catch (error) {
+                document.getElementById('loading').innerHTML = 
+                    `<div class="error">Errore: ${error.message}</div>`;
+            }
+        }
+
+        function calcolaClassificaFinoA(partite, indice) {
+            const ELO_INIZIALE = 1500;
+            const giocatori = {};
+            
+            // Processa solo le partite fino all'indice specificato (escluso)
+            for (let i = 0; i < indice; i++) {
+                const partita = partite[i];
+                
+                // Inizializza giocatori se non esistono
+                if (!giocatori[partita.giocatore1]) {
+                    giocatori[partita.giocatore1] = { elo: ELO_INIZIALE };
+                }
+                if (!giocatori[partita.giocatore2]) {
+                    giocatori[partita.giocatore2] = { elo: ELO_INIZIALE };
+                }
+                
+                const g1 = giocatori[partita.giocatore1];
+                const g2 = giocatori[partita.giocatore2];
+                
+                const elo1Vecchio = g1.elo;
+                const elo2Vecchio = g2.elo;
+                
+                g1.elo = calcolaElo(elo1Vecchio, elo2Vecchio, partita.punteggio1, partita.punteggio2);
+                g2.elo = calcolaElo(elo2Vecchio, elo1Vecchio, partita.punteggio2, partita.punteggio1);
+            }
+            
+            // Inizializza i giocatori della partita corrente se non hanno ancora giocato
+            if (!giocatori[partite[indice].giocatore1]) {
+                giocatori[partite[indice].giocatore1] = { elo: ELO_INIZIALE };
+            }
+            if (!giocatori[partite[indice].giocatore2]) {
+                giocatori[partite[indice].giocatore2] = { elo: ELO_INIZIALE };
+            }
+            
+            return giocatori;
+        }
+
+        function visualizzaDettaglioPartita(partita, matchIndex, player1Elo, player2Elo, dettagli1, dettagli2) {
+            const winner = partita.punteggio1 > partita.punteggio2 ? 1 : 2;
+            
+            const html = `
+                <div class="match-overview">
+                    <div class="match-title">Partita #${matchIndex + 1}</div>
+                    <div class="match-vs">
+                        <div class="player-box">
+                            <div class="player-name ${winner === 1 ? 'winner' : ''}">${partita.giocatore1}</div>
+                            <div class="player-score">${partita.punteggio1}</div>
+                            <div style="color: #999;">ELO Iniziale: ${player1Elo}</div>
+                        </div>
+                        <div class="vs-divider">VS</div>
+                        <div class="player-box">
+                            <div class="player-name ${winner === 2 ? 'winner' : ''}">${partita.giocatore2}</div>
+                            <div class="player-score">${partita.punteggio2}</div>
+                            <div style="color: #999;">ELO Iniziale: ${player2Elo}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculation-section">
+                    <div class="section-title">📊 Calcolo Dettagliato ELO</div>
+                    
+                    <div class="calculation-grid">
+                        ${generaCalcoloGiocatore(partita.giocatore1, player1Elo, player2Elo, dettagli1, winner === 1)}
+                        ${generaCalcoloGiocatore(partita.giocatore2, player2Elo, player1Elo, dettagli2, winner === 2)}
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">💡 Come Funziona il Calcolo ELO</div>
+                        <div class="info-box-content">
+                            <p><strong>1. Punteggio Atteso:</strong> Calcolato in base alla differenza di ELO tra i giocatori. Se hai un ELO più alto, ci si aspetta che tu vinca.</p>
+                            <p><strong>2. Fattore K:</strong> Determina quanto velocemente cambia l'ELO (in questo sistema K=32).</p>
+                            <p><strong>3. Fattore Differenza:</strong> Maggiore è la differenza di punteggio nella partita, maggiore è l'impatto sull'ELO. Una vittoria schiacciante conta di più!</p>
+                            <p><strong>4. Cambio ELO:</strong> Formula finale: K × Fattore Differenza × (Risultato - Punteggio Atteso)</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('matchContent').innerHTML = html;
+        }
+
+        function generaCalcoloGiocatore(nome, eloGiocatore, eloAvversario, dettagli, isWinner) {
+            const cambioEloFormatted = dettagli.cambioElo >= 0 ? `+${Math.round(dettagli.cambioElo)}` : Math.round(dettagli.cambioElo);
+            const cambioClass = dettagli.cambioElo >= 0 ? 'positive' : 'negative';
+            
+            return `
+                <div class="player-calculation ${isWinner ? 'winner' : ''}">
+                    <div class="calc-player-name">${nome}</div>
+                    
+                    <div class="calc-step">
+                        <div class="calc-step-title">1️⃣ Risultato della Partita</div>
+                        <div class="calc-step-value">${dettagli.risultato === 1 ? 'Vittoria (1)' : 'Sconfitta (0)'}</div>
+                        <div class="calc-step-explanation">
+                            ${dettagli.risultato === 1 ? 'Ha vinto la partita' : 'Ha perso la partita'}
+                        </div>
+                    </div>
+
+                    <div class="calc-step">
+                        <div class="calc-step-title">2️⃣ Punteggio Atteso</div>
+                        <div class="calc-step-value">${(dettagli.punteggioAtteso * 100).toFixed(1)}%</div>
+                        <div class="calc-step-explanation">
+                            Probabilità di vittoria basata sulla differenza di ELO:<br>
+                            Differenza ELO: ${eloGiocatore - eloAvversario} punti
+                            <div class="formula">1 / (1 + 10^((${eloAvversario} - ${eloGiocatore}) / 400))</div>
+                            ${dettagli.punteggioAtteso > 0.5 
+                                ? 'Favorito per vincere questa partita' 
+                                : dettagli.punteggioAtteso < 0.5 
+                                    ? 'Sfavorito in questa partita' 
+                                    : 'Partita equilibrata'}
+                        </div>
+                    </div>
+
+                    <div class="calc-step">
+                        <div class="calc-step-title">3️⃣ Fattore Differenza Punteggio</div>
+                        <div class="calc-step-value">×${dettagli.fattoreDifferenza.toFixed(2)}</div>
+                        <div class="calc-step-explanation">
+                            Differenza di punti nella partita: ${dettagli.differenzaPunti}<br>
+                            <div class="formula">1 + (${dettagli.differenzaPunti} / 20) = ${dettagli.fattoreDifferenza.toFixed(2)}</div>
+                            ${dettagli.differenzaPunti > 10 
+                                ? 'Vittoria/sconfitta schiacciante - grande impatto!' 
+                                : dettagli.differenzaPunti > 5 
+                                    ? 'Vittoria/sconfitta netta' 
+                                    : 'Partita combattuta'}
+                        </div>
+                    </div>
+
+                    <div class="calc-step">
+                        <div class="calc-step-title">4️⃣ Calcolo Cambio ELO</div>
+                        <div class="calc-step-value">
+                            32 × ${dettagli.fattoreDifferenza.toFixed(2)} × (${dettagli.risultato} - ${dettagli.punteggioAtteso.toFixed(3)})
+                        </div>
+                        <div class="calc-step-explanation">
+                            <div class="formula">
+                                K-Factor × Fattore Differenza × (Risultato - Punteggio Atteso)
+                            </div>
+                            = ${cambioEloFormatted} punti ELO
+                        </div>
+                    </div>
+
+                    <div class="elo-change">
+                        <div class="elo-change-title">Cambio ELO</div>
+                        <div class="elo-change-value ${cambioClass}">${cambioEloFormatted}</div>
+                        <div style="margin-top: 15px; font-size: 1.2em;">
+                            ${eloGiocatore} → ${dettagli.nuovoElo}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', inizializzaDettaglioPartita);
+    </script>
+</body>
+</html>
