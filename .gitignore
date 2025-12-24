@@ -1,7 +1,3 @@
 # Dependencies
 node_modules/
 
-# Note: Keep src/shared/output.css committed (needed for GitHub Pages)
-# Only ignore the source file
-src/shared/input.css
-
