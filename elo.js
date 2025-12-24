@@ -223,11 +223,17 @@ function visualizzaClassifica(classifica) {
  * Funzione principale per inizializzare l'applicazione
  */
 async function inizializza() {
+    // Only run on index.html (check if required elements exist)
+    const playersList = document.getElementById('playersList');
+    if (!playersList) {
+        return; // Not on the ranking page, skip initialization
+    }
+    
     try {
         const partite = await caricaPartite();
         
         if (partite.length === 0) {
-            document.getElementById('playersList').innerHTML = 
+            playersList.innerHTML = 
                 '<div class="error">Nessuna partita trovata nel file matches.txt</div>';
             return;
         }
@@ -237,7 +243,7 @@ async function inizializza() {
         visualizzaClassifica(classifica);
         
     } catch (error) {
-        document.getElementById('playersList').innerHTML = 
+        playersList.innerHTML = 
             `<div class="error">Errore: ${error.message}</div>`;
     }
 }
