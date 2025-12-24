@@ -4,7 +4,7 @@ Sergej - London: 23-21
 Nicoerri - Sergej: 21-19
 Sergej - Paolino: 10-21
 Rivio - Paolino: 21-18
-Paolino - Rivio: 9-11
+Paolino - Rivio: 11-9
 Sergej - Paolino: 16-21
 Sergej - Rivio: 16-21
 London - Nicoerri: 21-17
