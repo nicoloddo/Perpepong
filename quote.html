@@ -400,6 +400,7 @@
             <div class="betting-section">
                 <div class="section-header">💰 Quote Scommesse</div>
                 <div class="betting-odds" id="bettingOdds"></div>
+                <div id="betExample" style="padding: 16px; background: #f0f3ff; border-top: 1px solid #e0e0e0; font-size: 0.9em; color: #666;"></div>
                 <div class="elo-comparison">
                     <div class="elo-comparison-title">Rating ELO Attuale</div>
                     <div class="elo-comparison-values" id="eloComparison"></div>
@@ -570,7 +571,8 @@
             const player1WinProb = 1 / (1 + Math.pow(10, (player2Data.elo - player1Data.elo) / 400));
             const player2WinProb = 1 - player1WinProb;
             
-            // Calculate betting odds (decimal format)
+            // Calculate betting odds (decimal format) - Fair odds where 1/odds1 + 1/odds2 = 1
+            // This ensures that betting on both outcomes with proper allocation results in break-even
             const player1Odds = (1 / player1WinProb).toFixed(2);
             const player2Odds = (1 / player2WinProb).toFixed(2);
             
@@ -589,6 +591,17 @@
                     <div class="odds-label">Quota</div>
                     <div class="win-probability">${(player2WinProb * 100).toFixed(1)}% probabilità</div>
                 </div>
+            `;
+            
+            // Calculate break-even betting example
+            const totalBet = 10;
+            const bet1 = totalBet * player1WinProb;
+            const bet2 = totalBet * player2WinProb;
+            const returnAmount = (bet1 * parseFloat(player1Odds)).toFixed(2);
+            
+            document.getElementById('betExample').innerHTML = `
+                <strong>📊 Esempio Break-Even:</strong> Scommettendo ${bet1.toFixed(2)}€ su ${player1Data.nome} e ${bet2.toFixed(2)}€ su ${player2Data.nome}, 
+                ottieni ${returnAmount}€ in entrambi i casi (totale scommesso: ${totalBet}€ = pareggio)
             `;
             
             eloComparison.innerHTML = `

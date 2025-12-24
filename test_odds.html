@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Betting Odds</title>
+</head>
+<body>
+    <h1>Betting Odds Test</h1>
+    <div id="output"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        let html = '<h2>Testing Current Formula</h2>';
+        
+        // Test case 1: 60% vs 40% win probability
+        const prob1 = 0.6;
+        const prob2 = 0.4;
+        const odds1 = 1 / prob1;
+        const odds2 = 1 / prob2;
+        
+        html += `<h3>Example 1: ${(prob1*100).toFixed(1)}% vs ${(prob2*100).toFixed(1)}%</h3>`;
+        html += `<p>Odds Player 1: ${odds1.toFixed(2)}</p>`;
+        html += `<p>Odds Player 2: ${odds2.toFixed(2)}</p>`;
+        html += `<p>Check: 1/${odds1.toFixed(2)} + 1/${odds2.toFixed(2)} = ${(1/odds1 + 1/odds2).toFixed(4)} (should be 1.0)</p>`;
+        
+        // Break-even test
+        const totalBet = 10;
+        const bet1 = totalBet * prob1;
+        const bet2 = totalBet * prob2;
+        const return1 = bet1 * odds1;
+        const return2 = bet2 * odds2;
+        
+        html += `<h4>Break-even Test (betting ${totalBet}€ total):</h4>`;
+        html += `<p>Bet ${bet1.toFixed(2)}€ on Player 1 (odds ${odds1.toFixed(2)}): return = ${return1.toFixed(2)}€</p>`;
+        html += `<p>Bet ${bet2.toFixed(2)}€ on Player 2 (odds ${odds2.toFixed(2)}): return = ${return2.toFixed(2)}€</p>`;
+        html += `<p>Result: Both outcomes return ${return1.toFixed(2)}€ = break-even ✓</p>`;
+        
+        // Test case 2: 70% vs 30%
+        const prob3 = 0.7;
+        const prob4 = 0.3;
+        const odds3 = 1 / prob3;
+        const odds4 = 1 / prob4;
+        
+        html += `<h3>Example 2: ${(prob3*100).toFixed(1)}% vs ${(prob4*100).toFixed(1)}%</h3>`;
+        html += `<p>Odds Player 1: ${odds3.toFixed(2)}</p>`;
+        html += `<p>Odds Player 2: ${odds4.toFixed(2)}</p>`;
+        html += `<p>Check: 1/${odds3.toFixed(2)} + 1/${odds4.toFixed(2)} = ${(1/odds3 + 1/odds4).toFixed(4)} (should be 1.0)</p>`;
+        
+        const bet3 = totalBet * prob3;
+        const bet4 = totalBet * prob4;
+        const return3 = bet3 * odds3;
+        const return4 = bet4 * odds4;
+        
+        html += `<h4>Break-even Test (betting ${totalBet}€ total):</h4>`;
+        html += `<p>Bet ${bet3.toFixed(2)}€ on Player 1 (odds ${odds3.toFixed(2)}): return = ${return3.toFixed(2)}€</p>`;
+        html += `<p>Bet ${bet4.toFixed(2)}€ on Player 2 (odds ${odds4.toFixed(2)}): return = ${return4.toFixed(2)}€</p>`;
+        html += `<p>Result: Both outcomes return ${return3.toFixed(2)}€ = break-even ✓</p>`;
+        
+        output.innerHTML = html;
+    </script>
+</body>
+</html>
