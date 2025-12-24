@@ -200,7 +200,7 @@ function visualizzaClassifica(classifica) {
             : 0;
         
         return `
-            <div class="player-row">
+            <div class="player-row" onclick="window.location.href='player-profile.html?player=${encodeURIComponent(giocatore.nome)}'">
                 <div class="rank ${rankClass}">${posizione}°</div>
                 <div class="player-info">
                     <div class="player-name">${giocatore.nome}</div>
