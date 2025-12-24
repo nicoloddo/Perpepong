@@ -74,7 +74,7 @@ class MatchDetailCard extends HTMLElement {
   
   renderPlayerCalculation(nome, eloGiocatore, eloAvversario, dettagli, isWinner) {
     const cambioEloFormatted = dettagli.cambioElo >= 0 ? `+${Math.round(dettagli.cambioElo)}` : Math.round(dettagli.cambioElo);
-    const cambioClass = dettagli.cambioElo >= 0 ? 'text-green-600' : 'text-red-600';
+    const cambioClass = dettagli.cambioElo >= 0 ? 'text-green-500' : 'text-red-500';
     
     return `
       <div class="border-2 ${isWinner ? 'border-primary bg-primary/5' : 'border-border'} rounded-xl p-4 bg-muted/50">

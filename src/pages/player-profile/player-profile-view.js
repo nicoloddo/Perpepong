@@ -91,12 +91,12 @@ class PlayerProfileView extends HTMLElement {
         <div class="divide-y divide-border">
           <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">Punti Segnati</div></div><div class="text-2xl font-bold text-primary">${playerData.puntiSegnati}</div></div>
           <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">Punti Subiti</div></div><div class="text-2xl font-bold text-primary">${playerData.puntiSubiti}</div></div>
-          <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">Differenza Punti</div></div><div class="text-2xl font-bold ${pointsDiff >= 0 ? 'text-green-600' : 'text-red-600'}">${pointsDiff >= 0 ? '+' : ''}${pointsDiff}</div></div>
+          <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">Differenza Punti</div></div><div class="text-2xl font-bold ${pointsDiff >= 0 ? 'text-green-500' : 'text-red-500'}">${pointsDiff >= 0 ? '+' : ''}${pointsDiff}</div></div>
           <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">Media Punti Segnati/Partita</div></div><div class="text-2xl font-bold text-primary">${avgPointsScored}</div></div>
           <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">Media Punti Subiti/Partita</div></div><div class="text-2xl font-bold text-primary">${avgPointsConceded}</div></div>
           <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">ELO Massimo Raggiunto</div></div><div class="text-2xl font-bold text-primary">${maxElo}</div></div>
           <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">ELO Minimo Raggiunto</div></div><div class="text-2xl font-bold text-primary">${minElo}</div></div>
-          <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">Variazione ELO dall'inizio</div></div><div class="text-2xl font-bold ${eloDiff >= 0 ? 'text-green-600' : 'text-red-600'}">${eloDiffText}</div></div>
+          <div class="flex items-center p-4"><div class="flex-1"><div class="text-lg font-semibold">Variazione ELO dall'inizio</div></div><div class="text-2xl font-bold ${eloDiff >= 0 ? 'text-green-500' : 'text-red-500'}">${eloDiffText}</div></div>
         </div>
       </div>
 
@@ -109,7 +109,7 @@ class PlayerProfileView extends HTMLElement {
             const resultClass = match.won ? 'bg-primary/5' : 'bg-destructive/5';
             const resultText = match.won ? 'W' : 'L';
             const resultColor = match.won ? 'text-primary' : 'text-destructive';
-            const eloChangeClass = match.eloChange >= 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+            const eloChangeClass = match.eloChange >= 0 ? 'text-green-500 bg-green-50' : 'text-red-500 bg-red-50';
             const eloChangeText = match.eloChange >= 0 ? `+${Math.round(match.eloChange)}` : Math.round(match.eloChange);
 
             return `

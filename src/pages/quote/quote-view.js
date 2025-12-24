@@ -136,13 +136,13 @@ class QuoteView extends HTMLElement {
             <div class="text-lg font-bold mb-3">${player1Data.nome}</div>
             <div class="text-4xl font-bold text-primary mb-2">${(1 / player1WinProb).toFixed(2)}</div>
             <div class="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-2">Quota</div>
-            <div class="text-lg text-green-600 font-semibold">${(player1WinProb * 100).toFixed(1)}% probabilità</div>
+            <div class="text-lg text-green-500 font-semibold">${(player1WinProb * 100).toFixed(1)}% probabilità</div>
           </div>
           <div class="text-center p-5 bg-muted/50 rounded-xl border-2 ${!isFavorite1 ? 'border-primary bg-primary/5' : 'border-border'}">
             <div class="text-lg font-bold mb-3">${player2Data.nome}</div>
             <div class="text-4xl font-bold text-primary mb-2">${(1 / player2WinProb).toFixed(2)}</div>
             <div class="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-2">Quota</div>
-            <div class="text-lg text-green-600 font-semibold">${(player2WinProb * 100).toFixed(1)}% probabilità</div>
+            <div class="text-lg text-green-500 font-semibold">${(player2WinProb * 100).toFixed(1)}% probabilità</div>
           </div>
         </div>
         <div class="p-4 text-center bg-muted border-t border-border">
