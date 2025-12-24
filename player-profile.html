@@ -162,6 +162,7 @@
             padding: 14px 16px;
             border-bottom: 1px solid #f0f0f0;
             min-height: 70px;
+            transition: background-color 0.2s ease;
         }
 
         .match-row:last-child {
@@ -174,6 +175,10 @@
 
         .match-row.loss {
             background: rgba(255, 68, 68, 0.05);
+        }
+
+        .match-row:hover {
+            background: rgba(102, 126, 234, 0.15);
         }
 
         .match-result {
@@ -332,6 +337,7 @@
     <nav>
         <a href="index.html" class="active">Classifica</a>
         <a href="matches.html">Partite</a>
+        <a href="quote.html">Quote</a>
         <a href="stats.html">Statistiche</a>
     </nav>
 
@@ -551,7 +557,7 @@
                 const eloChangeText = match.eloChange >= 0 ? `+${Math.round(match.eloChange)}` : Math.round(match.eloChange);
 
                 return `
-                    <div class="match-row ${resultClass}">
+                    <div class="match-row ${resultClass}" style="cursor: pointer;" onclick="window.location.href='quote.html?player1=${encodeURIComponent(playerData.nome)}&player2=${encodeURIComponent(match.opponent)}'">
                         <div class="match-result ${resultClass}">${resultText}</div>
                         <div class="match-info">
                             <div class="match-opponent">vs ${match.opponent}</div>
