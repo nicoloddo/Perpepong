@@ -151,107 +151,162 @@ function calcolaClassifica(partite) {
 }
 
 /**
- * Visualizza le statistiche globali
+ * Calcola le statistiche globali dalla classifica
+ * @param {Array} classifica - Array di giocatori con statistiche
+ * @param {number} numeroPartite - Numero totale di partite
+ * @returns {Object} Oggetto con le statistiche globali
  */
-function visualizzaStatistiche(classifica, numeroPartite) {
-    const statsGrid = document.getElementById('statsGrid');
-    
+function calcolaStatisticheGlobali(classifica, numeroPartite) {
     const mediaElo = Math.round(
         classifica.reduce((sum, g) => sum + g.elo, 0) / classifica.length
     );
     
-    const totalePartite = classifica.reduce((sum, g) => sum + g.partiteGiocate, 0) / 2;
-    
-    statsGrid.innerHTML = `
-        <div class="stat-card">
-            <div class="stat-number">${classifica.length}</div>
-            <div class="stat-label">Giocatori</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">${numeroPartite}</div>
-            <div class="stat-label">Partite Totali</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">${mediaElo}</div>
-            <div class="stat-label">ELO Medio</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">${classifica[0].elo}</div>
-            <div class="stat-label">ELO Massimo</div>
-        </div>
-    `;
+    return {
+        numeroGiocatori: classifica.length,
+        numeroPartite: numeroPartite,
+        eloMedio: mediaElo,
+        eloMassimo: classifica.length > 0 ? classifica[0].elo : 1500
+    };
 }
 
 /**
- * Visualizza la classifica dei giocatori
+ * Calcola i dettagli del cambio ELO per una partita
+ * @param {number} playerElo - ELO del giocatore
+ * @param {number} opponentElo - ELO dell'avversario
+ * @param {number} playerScore - Punteggio del giocatore
+ * @param {number} opponentScore - Punteggio dell'avversario
+ * @param {number} kFactor - Fattore K (default: 32)
+ * @returns {Object} Dettagli del calcolo ELO
  */
-function visualizzaClassifica(classifica) {
-    const playersList = document.getElementById('playersList');
+function calcolaDettagliElo(playerElo, opponentElo, playerScore, opponentScore, kFactor = 32) {
+    const risultato = playerScore > opponentScore ? 1 : 0;
+    const punteggioAtteso = 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
+    const differenzaPunti = Math.abs(playerScore - opponentScore);
+    const fattoreDifferenza = 1 + (differenzaPunti / 20);
+    const cambioElo = kFactor * fattoreDifferenza * (risultato - punteggioAtteso);
+    const nuovoElo = playerElo + cambioElo;
     
-    if (classifica.length === 0) {
-        playersList.innerHTML = '<div class="error">Nessun giocatore trovato</div>';
-        return;
-    }
-    
-    const html = classifica.map((giocatore, index) => {
-        const posizione = index + 1;
-        let rankClass = '';
-        if (posizione === 1) rankClass = 'gold';
-        else if (posizione === 2) rankClass = 'silver';
-        else if (posizione === 3) rankClass = 'bronze';
-        
-        const percentualeVittorie = giocatore.partiteGiocate > 0
-            ? ((giocatore.vittorie / giocatore.partiteGiocate) * 100).toFixed(1)
-            : 0;
-        
-        return `
-            <div class="player-row" onclick="window.location.href='../player-profile/index.html?player=${encodeURIComponent(giocatore.nome)}'">
-                <div class="rank ${rankClass}">${posizione}°</div>
-                <div class="player-info">
-                    <div class="player-name">${giocatore.nome}</div>
-                    <div class="player-stats">
-                        ${giocatore.partiteGiocate} partite • 
-                        ${giocatore.vittorie}V-${giocatore.sconfitte}S • 
-                        ${percentualeVittorie}% vittorie • 
-                        ${giocatore.puntiSegnati} punti segnati
-                    </div>
-                </div>
-                <div class="elo-badge">${giocatore.elo}</div>
-            </div>
-        `;
-    }).join('');
-    
-    playersList.innerHTML = html;
+    return {
+        risultato,
+        punteggioAtteso,
+        differenzaPunti,
+        fattoreDifferenza,
+        cambioElo,
+        nuovoElo: Math.round(nuovoElo)
+    };
 }
 
 /**
- * Funzione principale per inizializzare l'applicazione
+ * Calcola la classifica fino a un certo indice di partita
+ * @param {Array} partite - Array di tutte le partite
+ * @param {number} indice - Indice fino al quale calcolare (esclusivo)
+ * @returns {Object} Oggetto con gli ELO dei giocatori a quel punto
  */
-async function inizializza() {
-    // Only run on index.html (check if required elements exist)
-    const playersList = document.getElementById('playersList');
-    if (!playersList) {
-        return; // Not on the ranking page, skip initialization
-    }
+function calcolaClassificaFinoA(partite, indice) {
+    const ELO_INIZIALE = 1500;
+    const giocatori = {};
     
-    try {
-        const partite = await caricaPartite();
+    for (let i = 0; i < indice; i++) {
+        const partita = partite[i];
         
-        if (partite.length === 0) {
-            playersList.innerHTML = 
-                '<div class="error">Nessuna partita trovata nel file matches.txt</div>';
-            return;
+        if (!giocatori[partita.giocatore1]) {
+            giocatori[partita.giocatore1] = { elo: ELO_INIZIALE };
+        }
+        if (!giocatori[partita.giocatore2]) {
+            giocatori[partita.giocatore2] = { elo: ELO_INIZIALE };
         }
         
-        const classifica = calcolaClassifica(partite);
-        visualizzaStatistiche(classifica, partite.length);
-        visualizzaClassifica(classifica);
+        const g1 = giocatori[partita.giocatore1];
+        const g2 = giocatori[partita.giocatore2];
         
-    } catch (error) {
-        playersList.innerHTML = 
-            `<div class="error">Errore: ${error.message}</div>`;
+        const elo1Vecchio = g1.elo;
+        const elo2Vecchio = g2.elo;
+        
+        g1.elo = calcolaElo(elo1Vecchio, elo2Vecchio, partita.punteggio1, partita.punteggio2);
+        g2.elo = calcolaElo(elo2Vecchio, elo1Vecchio, partita.punteggio2, partita.punteggio1);
     }
+    
+    if (!giocatori[partite[indice].giocatore1]) {
+        giocatori[partite[indice].giocatore1] = { elo: ELO_INIZIALE };
+    }
+    if (!giocatori[partite[indice].giocatore2]) {
+        giocatori[partite[indice].giocatore2] = { elo: ELO_INIZIALE };
+    }
+    
+    return giocatori;
 }
 
-// Avvia l'applicazione quando la pagina è caricata
-document.addEventListener('DOMContentLoaded', inizializza);
+/**
+ * Calcola le statistiche dettagliate per un giocatore specifico
+ * Include lo storico ELO attraverso tutte le partite
+ * @param {Array} partite - Array di tutte le partite
+ * @param {string} playerName - Nome del giocatore
+ * @returns {Array} Array di partite con dettagli ELO
+ */
+function calcolaStatisticheGiocatore(partite, playerName) {
+    const ELO_INIZIALE = 1500;
+    const giocatori = {};
+    const matchHistory = [];
+    
+    for (const partita of partite) {
+        if (!giocatori[partita.giocatore1]) {
+            giocatori[partita.giocatore1] = { elo: ELO_INIZIALE };
+        }
+        if (!giocatori[partita.giocatore2]) {
+            giocatori[partita.giocatore2] = { elo: ELO_INIZIALE };
+        }
+    }
+    
+    for (let i = 0; i < partite.length; i++) {
+        const partita = partite[i];
+        const isPlayer1 = partita.giocatore1 === playerName;
+        const isPlayer2 = partita.giocatore2 === playerName;
+        
+        if (isPlayer1 || isPlayer2) {
+            const g1 = giocatori[partita.giocatore1];
+            const g2 = giocatori[partita.giocatore2];
+            
+            const elo1Vecchio = g1.elo;
+            const elo2Vecchio = g2.elo;
+            
+            g1.elo = calcolaElo(elo1Vecchio, elo2Vecchio, partita.punteggio1, partita.punteggio2);
+            g2.elo = calcolaElo(elo2Vecchio, elo1Vecchio, partita.punteggio2, partita.punteggio1);
+            
+            if (isPlayer1) {
+                matchHistory.push({
+                    ...partita,
+                    matchNumber: i + 1,
+                    opponent: partita.giocatore2,
+                    playerScore: partita.punteggio1,
+                    opponentScore: partita.punteggio2,
+                    won: partita.punteggio1 > partita.punteggio2,
+                    eloChange: g1.elo - elo1Vecchio,
+                    eloAfter: g1.elo
+                });
+            } else {
+                matchHistory.push({
+                    ...partita,
+                    matchNumber: i + 1,
+                    opponent: partita.giocatore1,
+                    playerScore: partita.punteggio2,
+                    opponentScore: partita.punteggio1,
+                    won: partita.punteggio2 > partita.punteggio1,
+                    eloChange: g2.elo - elo2Vecchio,
+                    eloAfter: g2.elo
+                });
+            }
+        } else {
+            const g1 = giocatori[partita.giocatore1];
+            const g2 = giocatori[partita.giocatore2];
+            
+            const elo1Vecchio = g1.elo;
+            const elo2Vecchio = g2.elo;
+            
+            g1.elo = calcolaElo(elo1Vecchio, elo2Vecchio, partita.punteggio1, partita.punteggio2);
+            g2.elo = calcolaElo(elo2Vecchio, elo1Vecchio, partita.punteggio2, partita.punteggio1);
+        }
+    }
+    
+    return matchHistory;
+}
+
