@@ -35,6 +35,8 @@ function calcolaElo(playerElo, opponentElo, playerScore, opponentScore, kFactor 
  * Formato atteso: "nome1 - nome2: punteggio1-punteggio2"
  */
 function analizzaRiga(riga) {
+    // Trim the line to remove any whitespace or line ending characters
+    riga = riga.trim();
     const match = riga.match(/^(.+?)\s*-\s*(.+?):\s*(\d+)-(\d+)$/);
     if (!match) {
         return null;
@@ -53,7 +55,7 @@ function analizzaRiga(riga) {
  */
 async function caricaPartite() {
     try {
-        const response = await fetch('matches.txt');
+        const response = await fetch('../../../matches.txt');
         if (!response.ok) {
             throw new Error('Impossibile caricare il file matches.txt');
         }
@@ -66,9 +68,12 @@ async function caricaPartite() {
             const partita = analizzaRiga(riga);
             if (partita) {
                 partite.push(partita);
+            } else if (riga.trim()) {
+                console.warn('Riga non parsata:', riga, 'Lunghezza:', riga.length, 'Char codes:', [...riga].map(c => c.charCodeAt(0)));
             }
         }
         
+        console.log('Partite caricate:', partite.length);
         return partite;
     } catch (error) {
         console.error('Errore nel caricamento delle partite:', error);
@@ -200,7 +205,7 @@ function visualizzaClassifica(classifica) {
             : 0;
         
         return `
-            <div class="player-row" onclick="window.location.href='player-profile.html?player=${encodeURIComponent(giocatore.nome)}'">
+            <div class="player-row" onclick="window.location.href='../player-profile/index.html?player=${encodeURIComponent(giocatore.nome)}'">
                 <div class="rank ${rankClass}">${posizione}°</div>
                 <div class="player-info">
                     <div class="player-name">${giocatore.nome}</div>

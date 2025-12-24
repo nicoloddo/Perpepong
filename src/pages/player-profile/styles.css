@@ -1,0 +1,154 @@
+/* Player Profile Page Specific Styles */
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size: 0.95em;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.back-button:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.player-header {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.player-name-title {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.player-rank {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.rank-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.elo-display {
+    font-size: 3em;
+    font-weight: 700;
+    color: #667eea;
+    margin: 16px 0;
+}
+
+.elo-label {
+    color: #999;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.match-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 70px;
+    transition: background-color 0.2s ease;
+}
+
+.match-row:last-child {
+    border-bottom: none;
+}
+
+.match-row.win {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.match-row.loss {
+    background: rgba(255, 68, 68, 0.05);
+}
+
+.match-row:hover {
+    background: rgba(102, 126, 234, 0.15);
+}
+
+.match-result {
+    font-size: 1.2em;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: center;
+}
+
+.match-result.win {
+    color: #667eea;
+}
+
+.match-result.loss {
+    color: #ff4444;
+}
+
+.match-info {
+    flex: 1;
+    margin-left: 12px;
+    min-width: 0;
+}
+
+.match-opponent {
+    font-size: 1.05em;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.match-details {
+    color: #666;
+    font-size: 0.85em;
+}
+
+.match-score {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #333;
+    min-width: 70px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.elo-change {
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+.elo-change.positive {
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.elo-change.negative {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+

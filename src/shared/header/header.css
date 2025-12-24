@@ -1,0 +1,20 @@
+/* Header Component Styles */
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+    padding: 20px 12px;
+}
+
+h1 {
+    font-size: 1.75em;
+    margin-bottom: 8px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 0.95em;
+    opacity: 0.9;
+}
+

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+    <title>Partite - Perpeponghieri</title>
+    <link rel="stylesheet" href="../../shared/base.css">
+    <link rel="stylesheet" href="../../shared/header/header.css">
+    <link rel="stylesheet" href="../../shared/nav/nav.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏓 Classifica Perpeponghieri</h1>
+            <p class="subtitle">Sistema di Rating ELO</p>
+        </header>
+
+        <div class="matches-section">
+            <div class="section-header">
+                Tutte le Partite
+            </div>
+            <div class="matches-list" id="matchesList">
+                <div class="loading">Caricamento partite...</div>
+            </div>
+        </div>
+    </div>
+
+    <nav>
+        <a href="../home/index.html">Classifica</a>
+        <a href="../matches/index.html" class="active">Partite</a>
+        <a href="../quote/index.html">Quote</a>
+        <a href="../stats/index.html">Statistiche</a>
+    </nav>
+
+    <script src="../../backend/elo.js"></script>
+    <script>
+        async function inizializzaPartite() {
+            try {
+                const partite = await caricaPartite();
+                
+                if (partite.length === 0) {
+                    document.getElementById('matchesList').innerHTML = 
+                        '<div class="error">Nessuna partita trovata nel file matches.txt</div>';
+                    return;
+                }
+                
+                visualizzaPartite(partite);
+                
+            } catch (error) {
+                document.getElementById('matchesList').innerHTML = 
+                    `<div class="error">Errore: ${error.message}</div>`;
+            }
+        }
+
+        function visualizzaPartite(partite) {
+            const matchesList = document.getElementById('matchesList');
+            
+            const html = partite.map((partita, index) => {
+                const numeroPartita = index + 1;
+                const winner = partita.punteggio1 > partita.punteggio2 ? partita.giocatore1 : partita.giocatore2;
+                const player1Class = partita.punteggio1 > partita.punteggio2 ? 'winner' : '';
+                const player2Class = partita.punteggio2 > partita.punteggio1 ? 'winner' : '';
+                
+                return `
+                    <div class="match-row" onclick="window.location.href='../match-detail/index.html?match=${index}'">
+                        <div class="match-number">#${numeroPartita}</div>
+                        <div class="match-info">
+                            <div class="match-players">
+                                <span class="${player1Class}">${partita.giocatore1}</span>
+                                vs
+                                <span class="${player2Class}">${partita.giocatore2}</span>
+                            </div>
+                        </div>
+                        <div class="match-score">${partita.punteggio1} - ${partita.punteggio2}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            matchesList.innerHTML = html;
+        }
+
+        document.addEventListener('DOMContentLoaded', inizializzaPartite);
+    </script>
+</body>
+</html>
