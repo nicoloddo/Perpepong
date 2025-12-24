@@ -53,7 +53,7 @@ class QuoteView extends HTMLElement {
       <div id="comparisonContent" style="display: none;"></div>
 
       <!-- No Data Message -->
-      <div id="noDataMessage" class="p-10 text-center text-muted-foreground">
+      <div id="noDataMessage" class="p-10 text-center text-white">
         Seleziona due giocatori per visualizzare le quote e lo storico
       </div>
     `;
