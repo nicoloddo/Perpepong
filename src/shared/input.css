@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* WARNING: If you modify this file, run 'npm run build:css' to update src/shared/output.css */
+
 @layer base {
   :root {
     --background: 0 0% 100%;
