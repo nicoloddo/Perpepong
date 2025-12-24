@@ -69,10 +69,10 @@ Tutti i giocatori iniziano con un ELO di **1500 punti**.
 
 ### Locale
 
-1. Apri il file `index.html` in un browser moderno
-2. Assicurati che il file `matches.txt` sia nella stessa cartella
+1. Apri il file `index.html` nella root del progetto in un browser moderno
+2. Assicurati che il file `matches.txt` sia nella root del progetto
 
-**Nota**: A causa delle restrizioni CORS, potrebbe essere necessario usare un server locale:
+**Nota**: A causa delle restrizioni CORS, è necessario usare un server locale:
 
 ```bash
 # Con Python 3
@@ -80,6 +80,9 @@ python -m http.server 8000
 
 # Oppure con Node.js
 npx serve
+
+# Oppure con PHP
+php -S localhost:8000
 ```
 
 Poi visita `http://localhost:8000`
@@ -104,12 +107,40 @@ Per ogni giocatore viene mostrato:
 - Percentuale di vittorie
 - Punti totali segnati
 
-## 🛠️ Struttura del Codice
+## 🛠️ Struttura del Progetto
 
-### `index.html`
-File principale con la struttura HTML e gli stili CSS.
+```
+Perpepong/
+├── index.html              # Redirect alla home page
+├── matches.txt             # File dati con lo storico delle partite
+├── README.md               # Documentazione
+└── src/
+    ├── backend/
+    │   └── elo.js          # Logica di calcolo ELO e gestione dati
+    ├── shared/             # Componenti condivisi
+    │   ├── base.css        # Stili base comuni a tutte le pagine
+    │   ├── header/
+    │   │   ├── header.html # Componente header
+    │   │   └── header.css  # Stili header
+    │   └── nav/
+    │       ├── nav.html    # Componente navigazione
+    │       └── nav.css     # Stili navigazione
+    └── pages/
+        ├── home/
+        │   └── index.html  # Pagina principale con classifica
+        ├── matches/
+        │   └── index.html  # Lista di tutte le partite
+        ├── match-detail/
+        │   └── index.html  # Dettaglio partita con calcolo ELO
+        ├── player-profile/
+        │   └── index.html  # Profilo del giocatore
+        ├── quote/
+        │   └── index.html  # Quote scommesse e confronti
+        └── stats/
+            └── index.html  # Statistiche globali
+```
 
-### `elo.js`
+### `src/backend/elo.js`
 Contiene tutta la logica JavaScript:
 
 - `calcolaElo()`: Funzione isolata per il calcolo del rating ELO
