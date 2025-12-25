@@ -35,23 +35,69 @@ class VirtualMatch {
     
     /**
      * Calculate point-winning probability for player A
-     * Uses chess ELO formula with serving advantage
+     * Uses chess ELO formula to get MATCH win probability, then converts to per-point probability
      * @param {number} playerEloA - Player A's ELO rating
      * @param {number} playerEloB - Player B's ELO rating
      * @param {boolean} aIsServing - Whether player A is serving
      * @returns {number} Probability (0.0-1.0) that player A wins the point
      */
     calculatePointWinProbability(playerEloA, playerEloB, aIsServing) {
-        // Chess ELO expected score formula
-        // P(A wins) = 1 / (1 + 10^((ELO_B - ELO_A) / 400))
-        const baseProb = 1 / (1 + Math.pow(10, (playerEloB - playerEloA) / 400));
+        // Chess ELO expected score formula gives MATCH win probability
+        // P(A wins match) = 1 / (1 + 10^((ELO_B - ELO_A) / 400))
+        const matchWinProb = 1 / (1 + Math.pow(10, (playerEloB - playerEloA) / 400));
         
-        // Add 8% serving advantage (0.08 for server, -0.08 for receiver)
-        const servingBonus = aIsServing ? 0.08 : -0.08;
+        // Convert match win probability to per-point win probability
+        // This ensures ELO translates directly to match outcomes, not individual points
+        const perPointProb = this.matchWinProbToPerPointProb(matchWinProb);
         
-        // Clamp between 0.05 and 0.95 to avoid impossible situations
-        const finalProb = baseProb + servingBonus;
+        // Add 5% serving advantage (0.05 for server, -0.05 for receiver)
+        const servingBonus = aIsServing ? 0.05 : -0.05;
+        
+        // Apply serving bonus and clamp between 0.05 and 0.95
+        const finalProb = perPointProb + servingBonus;
         return Math.max(0.05, Math.min(0.95, finalProb));
+    }
+    
+    /**
+     * Convert match win probability to per-point win probability
+     * Uses empirical calibration for first-to-11 table tennis scoring
+     * @param {number} matchWinProb - Desired match win probability (0.0-1.0)
+     * @returns {number} Per-point win probability that achieves this match win rate
+     */
+    matchWinProbToPerPointProb(matchWinProb) {
+        // Clamp input to valid range
+        matchWinProb = Math.max(0.01, Math.min(0.99, matchWinProb));
+        
+        // Empirical calibration table for first-to-11 scoring
+        // Format: [matchWinProb, perPointProb]
+        const calibration = [
+            [0.50, 0.500],
+            [0.55, 0.505],
+            [0.60, 0.520],
+            [0.64, 0.535],
+            [0.70, 0.560],
+            [0.75, 0.575],
+            [0.80, 0.610],
+            [0.85, 0.630],
+            [0.90, 0.640],
+            [0.95, 0.665]
+        ];
+        
+        // Linear interpolation between calibration points
+        for (let i = 0; i < calibration.length - 1; i++) {
+            const [match1, point1] = calibration[i];
+            const [match2, point2] = calibration[i + 1];
+            
+            if (matchWinProb >= match1 && matchWinProb <= match2) {
+                // Linear interpolation
+                const t = (matchWinProb - match1) / (match2 - match1);
+                return point1 + t * (point2 - point1);
+            }
+        }
+        
+        // Edge cases
+        if (matchWinProb < 0.50) return 0.500;
+        return 0.665;
     }
     
     /**
