@@ -33,7 +33,7 @@ class MatchCard extends HTMLElement {
     
     const winner = score1 > score2 ? 'player1' : 'player2';
     const cursorClass = clickable ? 'cursor-pointer' : '';
-    const clickHandler = clickable ? `onclick="window.location.href='../match-detail/match-detail.html?match=${matchIndex}'"` : '';
+    const clickHandler = clickable ? `onclick="window.location.href='/match-detail/?match=${matchIndex}'"` : '';
     
     this.innerHTML = `
       <div class="flex items-center p-4 border-b border-border hover:bg-accent/50 transition-colors ${cursorClass}" 

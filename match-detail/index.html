@@ -7,13 +7,13 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#667eea">
     <title>Dettaglio Partita - Perpeponghieri</title>
-    <link rel="stylesheet" href="../../shared/output.css">
+    <link rel="stylesheet" href="/src/shared/output.css">
 </head>
 <body class="min-h-screen p-3 pb-20">
     <div class="container mx-auto max-w-full">
         <app-header title="🏓 Classifica Perpeponghieri" subtitle="Sistema di Rating ELO"></app-header>
 
-        <a href="../matches/matches.html" class="inline-flex items-center gap-2 bg-card text-primary px-5 py-3 rounded-xl font-semibold shadow-md mb-4 min-h-[44px] transition-all active:scale-98 active:bg-accent">
+        <a href="/matches/" class="inline-flex items-center gap-2 bg-card text-primary px-5 py-3 rounded-xl font-semibold shadow-md mb-4 min-h-[44px] transition-all active:scale-98 active:bg-accent">
             ← Torna alle partite
         </a>
 
@@ -22,8 +22,8 @@
 
     <app-nav></app-nav>
 
-    <script type="module" src="../../components/register.js"></script>
-    <script type="module" src="match-detail-view.js"></script>
-    <script src="../../backend/elo.js"></script>
+    <script type="module" src="/src/components/register.js"></script>
+    <script type="module" src="/src/pages/match-detail/match-detail-view.js"></script>
+    <script src="/src/backend/elo.js"></script>
 </body>
 </html>

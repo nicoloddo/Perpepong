@@ -2,13 +2,24 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=src/pages/home/home.html">
-    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+    <title>Classifica Perpeponghieri</title>
+    <link rel="stylesheet" href="/src/shared/output.css">
 </head>
-<body>
-    <p>Redirecting to home page...</p>
-    <script>
-        window.location.href = 'src/pages/home/home.html';
-    </script>
+<body class="min-h-screen p-3 pb-20">
+    <div class="container mx-auto max-w-full">
+        <app-header></app-header>
+
+        <home-view></home-view>
+    </div>
+
+    <app-nav active="home"></app-nav>
+
+    <script type="module" src="/src/components/register.js"></script>
+    <script type="module" src="/src/pages/home/home-view.js"></script>
+    <script src="/src/backend/elo.js"></script>
 </body>
 </html>
