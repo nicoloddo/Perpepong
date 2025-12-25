@@ -17,6 +17,11 @@ class DeterministicRNG {
      */
     constructor(seed) {
         this.state = seed;
+        // Warm up the generator by discarding the first 10 values
+        // This eliminates bias from small seeds (first values are highly correlated)
+        for (let i = 0; i < 10; i++) {
+            this.nextFloat();
+        }
     }
     
     /**
