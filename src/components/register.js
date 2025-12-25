@@ -17,4 +17,5 @@ import './player-card.js';
 import './stats-grid.js';
 import './match-detail-card.js';
 import './players-ranking.js';
+import './virtual-match-viewer.js';
 

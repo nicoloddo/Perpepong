@@ -15,8 +15,9 @@ class AppNav extends HTMLElement {
     const navItems = [
       { id: 'home', label: 'Classifica', href: '../home/home.html' },
       { id: 'matches', label: 'Partite', href: '../matches/matches.html' },
+      { id: 'stats', label: 'Statistiche', href: '../stats/stats.html' },
       { id: 'quote', label: 'Quote', href: '../quote/quote.html' },
-      { id: 'stats', label: 'Statistiche', href: '../stats/stats.html' }
+      { id: 'virtualini', label: 'Virtualini', href: '../virtualini/virtualini.html' }
     ];
     
     this.innerHTML = `
