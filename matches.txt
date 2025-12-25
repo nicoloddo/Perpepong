@@ -24,3 +24,12 @@ London - Sergej: 21-18
 Nicoerri - Ted: 21-9
 Nicoerri - Paolino: 7-21
 Sergej - London: 14-21
+Sergej - Nicoerri: 21-12
+Sergej - Nicoerri: 21-10
+Sergej - Nicoerri: 21-7
+Paolino - Ted: 21-10
+Paolino - Sergej: 21-18
+Rivio - Sergej: 21-17
+Rivio - London: 21-13
+London - Ted: 21-15
+Ted - Nicoerri: 23-21
