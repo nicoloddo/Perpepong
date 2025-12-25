@@ -230,7 +230,7 @@ class VirtualMatchViewer extends HTMLElement {
                     <div class="text-center p-4 rounded-lg ${state.lastWinner === "A" ? "bg-green-500/10 ring-2 ring-green-500" : "bg-muted/30"}">
                         <div class="text-xl font-bold mb-1">${this.match.playerA.name}</div>
                         <div class="text-xs text-muted-foreground mb-2">ELO: ${this.match.playerA.elo}</div>
-                        <div class="text-xs font-semibold text-primary" style="visibility: hidden">🎾 AL SERVIZIO</div>
+                        <div class="text-xs font-semibold text-primary" style="visibility: ${state.nextServer === "A" ? "visible" : "hidden"}">🎾 AL SERVIZIO</div>
                     </div>
                     
                     <!-- Score -->
@@ -247,7 +247,7 @@ class VirtualMatchViewer extends HTMLElement {
                     <div class="text-center p-4 rounded-lg ${state.lastWinner === "B" ? "bg-green-500/10 ring-2 ring-green-500" : "bg-muted/30"}">
                         <div class="text-xl font-bold mb-1">${this.match.playerB.name}</div>
                         <div class="text-xs text-muted-foreground mb-2">ELO: ${this.match.playerB.elo}</div>
-                        <div class="text-xs font-semibold text-primary" style="visibility: hidden">🎾 AL SERVIZIO</div>
+                        <div class="text-xs font-semibold text-primary" style="visibility: ${state.nextServer === "B" ? "visible" : "hidden"}">🎾 AL SERVIZIO</div>
                     </div>
                 </div>
             </div>
