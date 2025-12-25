@@ -160,58 +160,48 @@ class VirtualMatchViewer extends HTMLElement {
      * @param {Object} state - Match state
      */
     renderPlayingPoint(state) {
-        const serverName = state.server === "A" ? this.match.playerA.name : this.match.playerB.name;
         const progress = state.progress * 100;
         
         this.innerHTML = `
             <div class="bg-card p-6 rounded-xl shadow-lg space-y-6 mb-8">
                 <!-- Header -->
                 <div class="text-center">
-                    <h2 class="text-2xl font-bold text-primary mb-2">🏓 Partita Virtuale Live</h2>
-                    <div class="text-sm text-muted-foreground">
-                        Punto ${state.pointNumber} in corso...
-                    </div>
+                    <h2 class="text-xl font-bold text-primary mb-1">🏓 Partita Virtuale Live</h2>
+                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-destructive/10 text-destructive rounded-full text-xs font-medium">
+                        <span class="animate-pulse">●</span> LIVE
+                    </span>
                 </div>
                 
-                <!-- Players -->
-                <div class="grid grid-cols-3 gap-4 items-center">
+                <!-- Players with Score in Between -->
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-8 items-center">
                     <!-- Player A -->
-                    <div class="text-center ${state.server === "A" ? "bg-accent p-3 rounded-lg" : ""}">
-                        <div class="text-lg font-bold">${this.match.playerA.name}</div>
-                        <div class="text-sm text-muted-foreground">ELO: ${this.match.playerA.elo}</div>
-                        ${state.server === "A" ? '<div class="text-xs text-primary mt-1">🎾 Serve</div>' : ''}
+                    <div class="text-center p-4 bg-muted/30 rounded-lg ${state.server === "A" ? "ring-2 ring-primary" : ""}">
+                        <div class="text-xl font-bold mb-1">${this.match.playerA.name}</div>
+                        <div class="text-xs text-muted-foreground mb-2">ELO: ${this.match.playerA.elo}</div>
+                        <div class="text-xs font-semibold text-primary" style="visibility: ${state.server === "A" ? "visible" : "hidden"}">🎾 AL SERVIZIO</div>
                     </div>
                     
                     <!-- Score -->
-                    <div class="text-center">
-                        <div class="text-5xl font-bold text-primary">
+                    <div class="text-center px-6">
+                        <div class="text-6xl font-bold text-primary whitespace-nowrap">
                             ${state.currentScore.A} - ${state.currentScore.B}
+                        </div>
+                        <div class="text-sm text-muted-foreground mt-2">
+                            Punto ${state.pointNumber} • ${Math.ceil(state.secondsLeft)}s
                         </div>
                     </div>
                     
                     <!-- Player B -->
-                    <div class="text-center ${state.server === "B" ? "bg-accent p-3 rounded-lg" : ""}">
-                        <div class="text-lg font-bold">${this.match.playerB.name}</div>
-                        <div class="text-sm text-muted-foreground">ELO: ${this.match.playerB.elo}</div>
-                        ${state.server === "B" ? '<div class="text-xs text-primary mt-1">🎾 Serve</div>' : ''}
+                    <div class="text-center p-4 bg-muted/30 rounded-lg ${state.server === "B" ? "ring-2 ring-primary" : ""}">
+                        <div class="text-xl font-bold mb-1">${this.match.playerB.name}</div>
+                        <div class="text-xs text-muted-foreground mb-2">ELO: ${this.match.playerB.elo}</div>
+                        <div class="text-xs font-semibold text-primary" style="visibility: ${state.server === "B" ? "visible" : "hidden"}">🎾 AL SERVIZIO</div>
                     </div>
                 </div>
                 
                 <!-- Progress Bar -->
-                <div class="space-y-2">
-                    <div class="w-full bg-accent rounded-full h-3 overflow-hidden">
-                        <div class="bg-primary h-full transition-all duration-100" style="width: ${progress}%"></div>
-                    </div>
-                    <div class="text-center text-sm text-muted-foreground">
-                        ${Math.ceil(state.secondsLeft)}s rimanenti in questo scambio
-                    </div>
-                </div>
-                
-                <!-- Live indicator -->
-                <div class="text-center">
-                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-destructive/10 text-destructive rounded-full text-sm font-medium">
-                        <span class="animate-pulse">●</span> LIVE
-                    </span>
+                <div class="w-full bg-accent rounded-full h-2 overflow-hidden">
+                    <div class="bg-primary h-full transition-all duration-100" style="width: ${progress}%"></div>
                 </div>
             </div>
         `;
@@ -228,44 +218,37 @@ class VirtualMatchViewer extends HTMLElement {
             <div class="bg-card p-6 rounded-xl shadow-lg space-y-6 mb-8">
                 <!-- Header -->
                 <div class="text-center">
-                    <h2 class="text-2xl font-bold text-primary mb-2">🏓 Partita Virtuale Live</h2>
-                    <div class="text-sm text-green-500 font-medium">
-                        Punto a ${lastWinnerName}!
-                    </div>
+                    <h2 class="text-xl font-bold text-primary mb-1">🏓 Partita Virtuale Live</h2>
+                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-destructive/10 text-destructive rounded-full text-xs font-medium">
+                        <span class="animate-pulse">●</span> LIVE
+                    </span>
                 </div>
                 
-                <!-- Players -->
-                <div class="grid grid-cols-3 gap-4 items-center">
+                <!-- Players with Score in Between -->
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-8 items-center">
                     <!-- Player A -->
-                    <div class="text-center ${state.lastWinner === "A" ? "bg-green-500/10 p-3 rounded-lg" : ""}">
-                        <div class="text-lg font-bold">${this.match.playerA.name}</div>
-                        <div class="text-sm text-muted-foreground">ELO: ${this.match.playerA.elo}</div>
+                    <div class="text-center p-4 rounded-lg ${state.lastWinner === "A" ? "bg-green-500/10 ring-2 ring-green-500" : "bg-muted/30"}">
+                        <div class="text-xl font-bold mb-1">${this.match.playerA.name}</div>
+                        <div class="text-xs text-muted-foreground mb-2">ELO: ${this.match.playerA.elo}</div>
+                        <div class="text-xs font-semibold text-primary" style="visibility: hidden">🎾 AL SERVIZIO</div>
                     </div>
                     
                     <!-- Score -->
-                    <div class="text-center">
-                        <div class="text-5xl font-bold text-primary">
+                    <div class="text-center px-6">
+                        <div class="text-6xl font-bold text-primary whitespace-nowrap">
                             ${state.currentScore.A} - ${state.currentScore.B}
+                        </div>
+                        <div class="text-sm text-green-500 font-medium mt-2">
+                            ✓ Punto a ${lastWinnerName}!
                         </div>
                     </div>
                     
                     <!-- Player B -->
-                    <div class="text-center ${state.lastWinner === "B" ? "bg-green-500/10 p-3 rounded-lg" : ""}">
-                        <div class="text-lg font-bold">${this.match.playerB.name}</div>
-                        <div class="text-sm text-muted-foreground">ELO: ${this.match.playerB.elo}</div>
+                    <div class="text-center p-4 rounded-lg ${state.lastWinner === "B" ? "bg-green-500/10 ring-2 ring-green-500" : "bg-muted/30"}">
+                        <div class="text-xl font-bold mb-1">${this.match.playerB.name}</div>
+                        <div class="text-xs text-muted-foreground mb-2">ELO: ${this.match.playerB.elo}</div>
+                        <div class="text-xs font-semibold text-primary" style="visibility: hidden">🎾 AL SERVIZIO</div>
                     </div>
-                </div>
-                
-                <!-- Countdown -->
-                <div class="text-center text-sm text-muted-foreground">
-                    Prossimo punto tra ${Math.ceil(state.secondsUntilNext)}s...
-                </div>
-                
-                <!-- Live indicator -->
-                <div class="text-center">
-                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-destructive/10 text-destructive rounded-full text-sm font-medium">
-                        <span class="animate-pulse">●</span> LIVE
-                    </span>
                 </div>
             </div>
         `;
@@ -290,36 +273,33 @@ class VirtualMatchViewer extends HTMLElement {
             <div class="bg-card p-6 rounded-xl shadow-lg space-y-6 mb-8">
                 <!-- Header -->
                 <div class="text-center">
-                    <h2 class="text-2xl font-bold text-primary mb-2">🏓 Partita Conclusa!</h2>
-                    <div class="text-xl text-green-500 font-bold">
+                    <h2 class="text-xl font-bold text-primary mb-2">🏓 Partita Conclusa!</h2>
+                    <div class="text-lg text-green-500 font-bold">
                         Vittoria di ${winnerName}! 🎉
                     </div>
                 </div>
                 
-                <!-- Players -->
-                <div class="grid grid-cols-3 gap-4 items-center">
+                <!-- Players with Score in Between -->
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-8 items-center">
                     <!-- Player A -->
-                    <div class="text-center ${state.winner === "A" ? "bg-green-500/10 p-4 rounded-lg border-2 border-green-500" : "opacity-60"}">
-                        <div class="text-lg font-bold">${this.match.playerA.name}</div>
-                        <div class="text-sm text-muted-foreground">ELO: ${this.match.playerA.elo}</div>
-                        ${state.winner === "A" ? '<div class="text-2xl mt-2">👑</div>' : ''}
+                    <div class="text-center p-4 rounded-lg ${state.winner === "A" ? "bg-green-500/10 ring-2 ring-green-500" : "bg-muted/30 opacity-60"}">
+                        <div class="text-xl font-bold mb-1">${this.match.playerA.name}</div>
+                        <div class="text-xs text-muted-foreground mb-2">ELO: ${this.match.playerA.elo}</div>
+                        <div class="text-2xl">${state.winner === "A" ? "👑" : ""}</div>
                     </div>
                     
                     <!-- Final Score -->
-                    <div class="text-center">
-                        <div class="text-6xl font-bold text-primary">
+                    <div class="text-center px-6">
+                        <div class="text-6xl font-bold text-primary whitespace-nowrap">
                             ${state.finalScore.A} - ${state.finalScore.B}
-                        </div>
-                        <div class="text-sm text-muted-foreground mt-2">
-                            ${state.totalPoints} punti totali
                         </div>
                     </div>
                     
                     <!-- Player B -->
-                    <div class="text-center ${state.winner === "B" ? "bg-green-500/10 p-4 rounded-lg border-2 border-green-500" : "opacity-60"}">
-                        <div class="text-lg font-bold">${this.match.playerB.name}</div>
-                        <div class="text-sm text-muted-foreground">ELO: ${this.match.playerB.elo}</div>
-                        ${state.winner === "B" ? '<div class="text-2xl mt-2">👑</div>' : ''}
+                    <div class="text-center p-4 rounded-lg ${state.winner === "B" ? "bg-green-500/10 ring-2 ring-green-500" : "bg-muted/30 opacity-60"}">
+                        <div class="text-xl font-bold mb-1">${this.match.playerB.name}</div>
+                        <div class="text-xs text-muted-foreground mb-2">ELO: ${this.match.playerB.elo}</div>
+                        <div class="text-2xl">${state.winner === "B" ? "👑" : ""}</div>
                     </div>
                 </div>
                 
@@ -329,11 +309,6 @@ class VirtualMatchViewer extends HTMLElement {
                     <div class="text-3xl font-bold text-primary">
                         ${minutesUntilNext}:${remainingSeconds.toString().padStart(2, '0')}
                     </div>
-                </div>
-                
-                <!-- Info -->
-                <div class="text-center text-xs text-muted-foreground">
-                    Ogni 10 minuti inizia una nuova partita virtuale con giocatori casuali!
                 </div>
             </div>
         `;

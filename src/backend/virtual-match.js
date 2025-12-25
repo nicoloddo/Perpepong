@@ -116,8 +116,8 @@ class VirtualMatch {
             
             currentTime += pointDuration;
             
-            // Add a 5-second break between points (players reset)
-            currentTime += 5;
+            // Add a 3-second break between points (players reset)
+            currentTime += 3;
             
             pointCount++;
             
@@ -167,7 +167,7 @@ class VirtualMatch {
             }
             
             // Are we in the break after this point?
-            if (elapsedSeconds >= point.endTime && elapsedSeconds < point.endTime + 5) {
+            if (elapsedSeconds >= point.endTime && elapsedSeconds < point.endTime + 3) {
                 return {
                     status: "BETWEEN_POINTS",
                     currentScore: {
@@ -176,7 +176,7 @@ class VirtualMatch {
                     },
                     lastWinner: point.winner,
                     nextServer: point.server,
-                    secondsUntilNext: (point.endTime + 5) - elapsedSeconds,
+                    secondsUntilNext: (point.endTime + 3) - elapsedSeconds,
                     pointNumber: i + 1
                 };
             }
