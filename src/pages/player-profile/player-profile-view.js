@@ -1,6 +1,6 @@
 /**
  * Player Profile View Web Component
- * Displays detailed player profile with statistics and match history
+ * Displays detailed player profile with statistics and match history (most recent first)
  * Loads data based on URL parameter
  * 
  * Usage:

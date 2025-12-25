@@ -1,7 +1,7 @@
 /**
  * Matches View Web Component
  * Main view component for the matches page
- * Displays all matches in chronological order
+ * Displays all matches with most recent first
  * 
  * Usage:
  * <matches-view></matches-view>
@@ -34,16 +34,19 @@ class MatchesView extends HTMLElement {
         return;
       }
       
-      const matchesHTML = partite.map((partita, index) => `
-        <match-card 
-          match-number="${index + 1}"
-          match-index="${index}"
-          player1="${partita.giocatore1}"
-          player2="${partita.giocatore2}"
-          score1="${partita.punteggio1}"
-          score2="${partita.punteggio2}">
-        </match-card>
-      `).join('');
+      const matchesHTML = [...partite].reverse().map((partita, index) => {
+        const originalIndex = partite.length - 1 - index;
+        return `
+          <match-card 
+            match-number="${originalIndex + 1}"
+            match-index="${originalIndex}"
+            player1="${partita.giocatore1}"
+            player2="${partita.giocatore2}"
+            score1="${partita.punteggio1}"
+            score2="${partita.punteggio2}">
+          </match-card>
+        `;
+      }).join('');
       
       this.innerHTML = `
         <div class="bg-card rounded-2xl shadow-lg overflow-hidden mb-5">
