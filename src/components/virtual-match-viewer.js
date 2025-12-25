@@ -176,7 +176,7 @@ class VirtualMatchViewer extends HTMLElement {
                 scoreEl.textContent = `${state.currentScore.A} - ${state.currentScore.B}`;
             }
             
-            const pointEl = this.querySelector('.text-xs.text-muted-foreground, .text-sm.text-muted-foreground');
+            const pointEl = this.querySelector('#point-number-display');
             if (pointEl) {
                 pointEl.textContent = `P${state.pointNumber}`;
             }
@@ -253,7 +253,7 @@ class VirtualMatchViewer extends HTMLElement {
                         <div class="text-3xl sm:text-4xl md:text-6xl font-bold text-primary whitespace-nowrap">
                             ${state.currentScore.A} - ${state.currentScore.B}
                         </div>
-                        <div class="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2 whitespace-nowrap">
+                        <div id="point-number-display" class="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2 whitespace-nowrap">
                             P${state.pointNumber}
                         </div>
                     </div>
