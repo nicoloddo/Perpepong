@@ -3,7 +3,7 @@
  * Displays the bottom navigation bar with active state
  * 
  * Attributes:
- * - active: ID of the active page ('home', 'matches', 'quote', 'stats')
+ * - active: ID of the active page ('home', 'matches', 'quote', 'virtualini')
  * 
  * Usage:
  * <app-nav active="home"></app-nav>
@@ -15,7 +15,6 @@ class AppNav extends HTMLElement {
     const navItems = [
       { id: 'home', label: 'Classifica', href: '../home/home.html' },
       { id: 'matches', label: 'Partite', href: '../matches/matches.html' },
-      { id: 'stats', label: 'Statistiche', href: '../stats/stats.html' },
       { id: 'quote', label: 'Quote', href: '../quote/quote.html' },
       { id: 'virtualini', label: 'Virtualini Live', href: '../virtualini/virtualini.html' }
     ];
