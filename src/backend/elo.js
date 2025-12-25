@@ -55,7 +55,7 @@ function analizzaRiga(riga) {
  */
 async function caricaPartite() {
     try {
-        const response = await fetch('../../../matches.txt');
+        const response = await fetch(window.getPath('/matches.txt'));
         if (!response.ok) {
             throw new Error('Impossibile caricare il file matches.txt');
         }
