@@ -50,8 +50,8 @@ class VirtualMatch {
         // This ensures ELO translates directly to match outcomes, not individual points
         const perPointProb = this.matchWinProbToPerPointProb(matchWinProb);
         
-        // Add 5% serving advantage (0.05 for server, -0.05 for receiver)
-        const servingBonus = aIsServing ? 0.05 : -0.05;
+        // Add serving advantage (currently 0% - no serving advantage)
+        const servingBonus = aIsServing ? 0.0 : 0.0;
         
         // Apply serving bonus and clamp between 0.05 and 0.95
         const finalProb = perPointProb + servingBonus;
