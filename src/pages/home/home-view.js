@@ -163,9 +163,9 @@ class HomeView extends HTMLElement {
           </div>
           
           <!-- Expand/Collapse Button -->
-          <button id="toggle-stats-btn" class="w-full mt-3 py-3 px-4 bg-primary text-primary-foreground font-semibold rounded-xl shadow-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2">
+          <button id="toggle-stats-btn" class="mt-3 py-2 px-4 bg-primary text-primary-foreground text-sm font-semibold rounded-lg shadow-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto">
             <span id="toggle-text">${this.isExpanded ? 'Nascondi statistiche' : 'Mostra tutte le statistiche'}</span>
-            <svg id="toggle-icon" class="w-5 h-5 transition-transform ${this.isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg id="toggle-icon" class="w-4 h-4 transition-transform ${this.isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </button>
@@ -183,10 +183,24 @@ class HomeView extends HTMLElement {
     
     // Add event listener for toggle button
     const toggleBtn = this.querySelector('#toggle-stats-btn');
-    if (toggleBtn) {
+    const expandableStats = this.querySelector('#expandable-stats');
+    const toggleText = this.querySelector('#toggle-text');
+    const toggleIcon = this.querySelector('#toggle-icon');
+    
+    if (toggleBtn && expandableStats) {
       toggleBtn.addEventListener('click', () => {
         this.isExpanded = !this.isExpanded;
-        this.render();
+        
+        // Toggle visibility
+        if (this.isExpanded) {
+          expandableStats.classList.remove('hidden');
+          toggleText.textContent = 'Nascondi statistiche';
+          toggleIcon.classList.add('rotate-180');
+        } else {
+          expandableStats.classList.add('hidden');
+          toggleText.textContent = 'Mostra tutte le statistiche';
+          toggleIcon.classList.remove('rotate-180');
+        }
       });
     }
   }
