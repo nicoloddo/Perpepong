@@ -32,7 +32,17 @@ This document explains the architecture patterns and conventions used in this pr
 
 ```
 Perpepong/
-├── index.html                    # Root redirect to home page
+├── index.html                    # Home page (accessible via /)
+├── matches/                      # /matches/ URL
+│   └── index.html                # Page HTML
+├── quote/                        # /quote/ URL
+│   └── index.html                # Page HTML
+├── virtualini/                   # /virtualini/ URL
+│   └── index.html                # Page HTML
+├── match-detail/                 # /match-detail/ URL
+│   └── index.html                # Page HTML
+├── player-profile/               # /player-profile/ URL
+│   └── index.html                # Page HTML
 ├── matches.txt                   # Match data (never move/delete)
 ├── README.md                     # User documentation
 ├── AGENTS.md                     # This file - architecture guide
@@ -67,25 +77,19 @@ Perpepong/
     │   ├── input.css             # Tailwind source (gitignored)
     │   └── output.css            # Compiled CSS (committed)
     │
-    └── pages/                    # ✅ PAGE-SPECIFIC files
+    └── pages/                    # ✅ PAGE-SPECIFIC view components
         ├── home/
-        │   ├── home.html         # Page HTML
         │   └── home-view.js      # Page view component
         ├── matches/
-        │   ├── matches.html
         │   └── matches-view.js
         ├── match-detail/
-        │   ├── match-detail.html
         │   └── match-detail-view.js
         ├── player-profile/
-        │   ├── player-profile.html
         │   └── player-profile-view.js
         ├── quote/
-        │   ├── quote.html
         │   └── quote-view.js
-        └── stats/
-            ├── stats.html
-            └── stats-view.js
+        └── virtualini/
+            (uses components from other pages)
 ```
 
 ---
@@ -93,9 +97,10 @@ Perpepong/
 ## 📝 File Naming Conventions
 
 ### HTML Files
-- **Pattern**: `{page-name}.html`
-- **Location**: `src/pages/{page-name}/`
-- **Example**: `src/pages/home/home.html`
+- **Pattern**: `index.html`
+- **Location**: `/{page-name}/` (root level) OR `/` for home page
+- **Example**: `/matches/index.html` or `/index.html` (home)
+- **URLs**: Clean URLs like `/matches/`, `/virtualini/`, etc.
 
 ### Page View Components
 - **Pattern**: `{page-name}-view.js`
@@ -245,21 +250,22 @@ function visualizzaClassifica(classifica) {
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <title>Page Title</title>
-    <link rel="stylesheet" href="../../shared/output.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Page Title</title>
+ <link rel="stylesheet" href="/src/shared/output.css">
 </head>
 <body class="min-h-screen p-3 pb-20">
-    <div class="container mx-auto max-w-full">
-        <app-header></app-header>
-        <page-name-view></page-name-view>
-    </div>
-    <app-nav active="page-name"></app-nav>
-    
-    <!-- Import order matters! -->
-    <script type="module" src="../../components/register.js"></script>
-    <script type="module" src="page-name-view.js"></script>
-    <script src="../../backend/elo.js"></script>
+ <div class="container mx-auto max-w-full">
+ <app-header></app-header>
+ <page-name-view></page-name-view>
+ </div>
+ <app-nav active="page-name"></app-nav>
+ 
+ <!-- Import order matters! Use absolute paths from root -->
+ <script type="module" src="/src/components/register.js"></script>
+ <script type="module" src="/src/pages/page-name/page-name-view.js"></script>
+ <script src="/src/backend/elo.js"></script>
 </body>
 </html>
 ```
@@ -270,40 +276,53 @@ function visualizzaClassifica(classifica) {
 
 Follow this checklist:
 
-1. **Create page directory**: `src/pages/{page-name}/`
+1. **Create view component directory**: `src/pages/{page-name}/`
 
-2. **Create HTML file**: `src/pages/{page-name}/{page-name}.html`
-   ```html
-   <body>
-       <app-header></app-header>
-       <page-name-view></page-name-view>
-       <app-nav active="page-name"></app-nav>
-       
-       <script type="module" src="../../components/register.js"></script>
-       <script type="module" src="{page-name}-view.js"></script>
-       <script src="../../backend/elo.js"></script>
-   </body>
-   ```
+2. **Create view component**: `src/pages/{page-name}/{page-name}-view.js`
+ ```javascript
+ class PageNameView extends HTMLElement {
+ async connectedCallback() {
+ // Load data and render
+ }
+ }
+ customElements.define('page-name-view', PageNameView);
+ ```
 
-3. **Create view component**: `src/pages/{page-name}/{page-name}-view.js`
-   ```javascript
-   class PageNameView extends HTMLElement {
-     async connectedCallback() {
-       // Load data and render
-     }
-   }
-   customElements.define('page-name-view', PageNameView);
-   ```
+3. **Create page folder at root**: `/{page-name}/`
 
-4. **Update navigation**: Add to `src/components/app-nav.js`
-   ```javascript
-   const navItems = [
-     // ... existing items
-     { id: 'page-name', label: 'Label', href: '../page-name/page-name.html' }
-   ];
-   ```
+4. **Create HTML file**: `/{page-name}/index.html`
+ ```html
+ <!DOCTYPE html>
+ <html lang="it">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Page Title</title>
+ <link rel="stylesheet" href="/src/shared/output.css">
+ </head>
+ <body class="min-h-screen p-3 pb-20">
+ <div class="container mx-auto max-w-full">
+ <app-header></app-header>
+ <page-name-view></page-name-view>
+ </div>
+ <app-nav active="page-name"></app-nav>
+ 
+ <script type="module" src="/src/components/register.js"></script>
+ <script type="module" src="/src/pages/{page-name}/{page-name}-view.js"></script>
+ <script src="/src/backend/elo.js"></script>
+ </body>
+ </html>
+ ```
 
-5. **Test the page**: Visit `http://localhost:8000/src/pages/page-name/page-name.html`
+5. **Update navigation**: Add to `src/components/app-nav.js`
+ ```javascript
+ const navItems = [
+ // ... existing items
+ { id: 'page-name', label: 'Label', href: '/page-name/' }
+ ];
+ ```
+
+6. **Test the page**: Visit `http://localhost:8000/page-name/`
 
 ---
 
@@ -349,22 +368,27 @@ Follow this checklist:
 
 ### URL Structure
 
-- **Home**: `/src/pages/home/home.html`
-- **Other pages**: `/src/pages/{page-name}/{page-name}.html`
-- **Root redirect**: `/index.html` → redirects to home
+- **Home**: `/` (serves `/index.html`)
+- **Other pages**: `/{page-name}/` (serves `/{page-name}/index.html`)
+- **Examples**: 
+  - `/matches/` → `/matches/index.html`
+  - `/virtualini/` → `/virtualini/index.html`
+  - `/player-profile/?player=London` → with URL parameters
 
 ### Internal Links
 
-**Always use relative paths from page location:**
+**Always use absolute paths from root:**
 
 ```javascript
-// From any page to another page
-'../{target-page}/{target-page}.html'
+// Navigation between pages
+'/' // Home
+'/matches/' // Matches page
+'/quote/' // Quote page
+'/player-profile/?player=London' // With parameters
 
-// Examples:
-'../home/home.html'
-'../matches/matches.html'
-'../player-profile/player-profile.html?player=London'
+// Examples in code:
+onclick="window.location.href='/player-profile/?player=${encodeURIComponent(name)}'"
+onclick="window.location.href='/match-detail/?match=${matchIndex}'"
 ```
 
 ### Navigation Component
@@ -375,7 +399,7 @@ The `<app-nav>` component handles bottom navigation:
 <app-nav active="home"></app-nav>
 ```
 
-Valid `active` values: `home`, `matches`, `quote`, `stats`
+Valid `active` values: `home`, `matches`, `quote`, `virtualini`
 
 ### URL Parameters
 

@@ -52,7 +52,7 @@ class PlayerCard extends HTMLElement {
     }
     
     const cursorClass = clickable ? 'cursor-pointer' : '';
-    const clickHandler = clickable ? `onclick="window.location.href='../player-profile/player-profile.html?player=${encodeURIComponent(name)}'"` : '';
+    const clickHandler = clickable ? `onclick="window.location.href='/player-profile/?player=${encodeURIComponent(name)}'"` : '';
     
     this.innerHTML = `
       <div class="flex items-center p-4 border-b border-border hover:bg-accent/50 transition-colors min-h-[70px] ${cursorClass}" ${clickHandler}>
