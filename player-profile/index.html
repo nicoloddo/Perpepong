@@ -7,11 +7,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#667eea">
     <title>Profilo Giocatore - Perpeponghieri</title>
-    <link rel="stylesheet" href="/src/shared/output.css">
+    <link rel="stylesheet" href="../src/shared/output.css">
 </head>
 <body class="min-h-screen p-3 pb-20">
     <div class="container mx-auto max-w-full">
-        <a href="/" class="inline-flex items-center gap-2 text-white bg-white/20 px-4 py-2 rounded-lg font-semibold mb-3 transition-all active:scale-95 active:bg-white/30">
+        <a href="#" onclick="event.preventDefault(); window.location.href=window.getPath('/');" class="inline-flex items-center gap-2 text-white bg-white/20 px-4 py-2 rounded-lg font-semibold mb-3 transition-all active:scale-95 active:bg-white/30">
             ← Torna alla classifica
         </a>
 
@@ -20,8 +20,9 @@
 
     <app-nav active="home"></app-nav>
 
-    <script type="module" src="/src/components/register.js"></script>
-    <script type="module" src="/src/pages/player-profile/player-profile-view.js"></script>
-    <script src="/src/backend/elo.js"></script>
+    <script src="../src/shared/base-path.js"></script>
+    <script type="module" src="../src/components/register.js"></script>
+    <script type="module" src="../src/pages/player-profile/player-profile-view.js"></script>
+    <script src="../src/backend/elo.js"></script>
 </body>
 </html>

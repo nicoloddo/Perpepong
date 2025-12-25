@@ -13,10 +13,10 @@ class AppNav extends HTMLElement {
   connectedCallback() {
     const active = this.getAttribute('active') || '';
     const navItems = [
-      { id: 'home', label: 'Classifica', href: '/' },
-      { id: 'matches', label: 'Partite', href: '/matches/' },
-      { id: 'quote', label: 'Quote', href: '/quote/' },
-      { id: 'virtualini', label: 'Virtualini Live', href: '/virtualini/' }
+      { id: 'home', label: 'Classifica', href: window.getPath('/') },
+      { id: 'matches', label: 'Partite', href: window.getPath('/matches/') },
+      { id: 'quote', label: 'Quote', href: window.getPath('/quote/') },
+      { id: 'virtualini', label: 'Virtualini Live', href: window.getPath('/virtualini/') }
     ];
     
     this.innerHTML = `

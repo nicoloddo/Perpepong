@@ -74,6 +74,7 @@ Perpepong/
     │   └── players-ranking.js    # <players-ranking>
     │
     ├── shared/
+    │   ├── base-path.js          # Base path helper for navigation
     │   ├── input.css             # Tailwind source (gitignored)
     │   └── output.css            # Compiled CSS (committed)
     │
@@ -246,6 +247,8 @@ function visualizzaClassifica(classifica) {
 - Manipulate DOM directly
 
 **Example Page Structure:**
+
+**For root index.html:**
 ```html
 <!DOCTYPE html>
 <html lang="it">
@@ -253,7 +256,7 @@ function visualizzaClassifica(classifica) {
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>Page Title</title>
- <link rel="stylesheet" href="/src/shared/output.css">
+ <link rel="stylesheet" href="./src/shared/output.css">
 </head>
 <body class="min-h-screen p-3 pb-20">
  <div class="container mx-auto max-w-full">
@@ -262,10 +265,37 @@ function visualizzaClassifica(classifica) {
  </div>
  <app-nav active="page-name"></app-nav>
  
- <!-- Import order matters! Use absolute paths from root -->
- <script type="module" src="/src/components/register.js"></script>
- <script type="module" src="/src/pages/page-name/page-name-view.js"></script>
- <script src="/src/backend/elo.js"></script>
+ <!-- Import order matters! Use relative paths -->
+ <script src="./src/shared/base-path.js"></script>
+ <script type="module" src="./src/components/register.js"></script>
+ <script type="module" src="./src/pages/home/home-view.js"></script>
+ <script src="./src/backend/elo.js"></script>
+</body>
+</html>
+```
+
+**For subpage (e.g., /matches/index.html):**
+```html
+<!DOCTYPE html>
+<html lang="it">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Page Title</title>
+ <link rel="stylesheet" href="../src/shared/output.css">
+</head>
+<body class="min-h-screen p-3 pb-20">
+ <div class="container mx-auto max-w-full">
+ <app-header></app-header>
+ <page-name-view></page-name-view>
+ </div>
+ <app-nav active="page-name"></app-nav>
+ 
+ <!-- Import order matters! Use relative paths -->
+ <script src="../src/shared/base-path.js"></script>
+ <script type="module" src="../src/components/register.js"></script>
+ <script type="module" src="../src/pages/page-name/page-name-view.js"></script>
+ <script src="../src/backend/elo.js"></script>
 </body>
 </html>
 ```
@@ -377,19 +407,30 @@ Follow this checklist:
 
 ### Internal Links
 
-**Always use absolute paths from root:**
+**Always use the `window.getPath()` helper for navigation:**
+
+The project includes a `base-path.js` utility that automatically handles both local development (`/`) and GitHub Pages deployment (`/Perpepong/`).
 
 ```javascript
-// Navigation between pages
-'/' // Home
-'/matches/' // Matches page
-'/quote/' // Quote page
-'/player-profile/?player=London' // With parameters
+// Navigation between pages - ALWAYS use window.getPath()
+window.getPath('/') // Home
+window.getPath('/matches/') // Matches page
+window.getPath('/quote/') // Quote page
+window.getPath('/player-profile/?player=London') // With parameters
 
 // Examples in code:
-onclick="window.location.href='/player-profile/?player=${encodeURIComponent(name)}'"
-onclick="window.location.href='/match-detail/?match=${matchIndex}'"
+onclick="window.location.href=window.getPath('/player-profile/?player=${encodeURIComponent(name)}')"
+onclick="window.location.href=window.getPath('/match-detail/?match=${matchIndex}')"
+
+// In HTML links:
+<a href="#" onclick="event.preventDefault(); window.location.href=window.getPath('/matches/');">Link</a>
 ```
+
+**Why use `window.getPath()`?**
+- ✅ Works in local development (`http://localhost:8000/`)
+- ✅ Works on GitHub Pages (`https://username.github.io/Perpepong/`)
+- ✅ No build process needed
+- ✅ Automatic base path detection
 
 ### Navigation Component
 
@@ -411,7 +452,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const playerId = urlParams.get('player');
 
 // Creating links with parameters
-const url = `../player-profile/player-profile.html?player=${encodeURIComponent(playerName)}`;
+const url = window.getPath(`/player-profile/?player=${encodeURIComponent(playerName)}`);
 ```
 
 ---

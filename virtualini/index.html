@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#667eea">
     <title>Virtualini - Perpepong</title>
-    <link rel="stylesheet" href="/src/shared/output.css">
+    <link rel="stylesheet" href="../src/shared/output.css">
     <style>
         /* Hide player selector in virtualini page since players are auto-selected */
         quote-view > div:first-child {
@@ -31,13 +31,14 @@
     <app-nav active="virtualini"></app-nav>
 
     <!-- Load components and backend in correct order -->
-    <script type="module" src="/src/components/register.js"></script>
-    <script src="/src/backend/elo.js"></script>
-    <script src="/src/backend/deterministic-rng.js"></script>
-    <script src="/src/backend/virtual-match.js"></script>
-    <script src="/src/components/pong-animator.js"></script>
-    <script type="module" src="/src/components/virtual-match-viewer.js"></script>
-    <script type="module" src="/src/pages/quote/quote-view.js"></script>
+    <script src="../src/shared/base-path.js"></script>
+    <script type="module" src="../src/components/register.js"></script>
+    <script src="../src/backend/elo.js"></script>
+    <script src="../src/backend/deterministic-rng.js"></script>
+    <script src="../src/backend/virtual-match.js"></script>
+    <script src="../src/components/pong-animator.js"></script>
+    <script type="module" src="../src/components/virtual-match-viewer.js"></script>
+    <script type="module" src="../src/pages/quote/quote-view.js"></script>
     
     <!-- Auto-populate quote with virtual match players -->
     <script type="module">

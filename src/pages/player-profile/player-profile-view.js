@@ -113,7 +113,7 @@ class PlayerProfileView extends HTMLElement {
             const eloChangeText = match.eloChange >= 0 ? `+${Math.round(match.eloChange)}` : Math.round(match.eloChange);
 
             return `
-              <div class="flex items-center p-4 cursor-pointer hover:bg-accent/50 transition-colors ${resultClass}" onclick="window.location.href='/quote/?player1=${encodeURIComponent(playerData.nome)}&player2=${encodeURIComponent(match.opponent)}'">
+              <div class="flex items-center p-4 cursor-pointer hover:bg-accent/50 transition-colors ${resultClass}" onclick="window.location.href=window.getPath('/quote/?player1=${encodeURIComponent(playerData.nome)}&player2=${encodeURIComponent(match.opponent)}')">
                 <div class="text-xl font-bold ${resultColor} min-w-[40px] text-center">${resultText}</div>
                 <div class="flex-1 ml-3">
                   <div class="text-lg font-semibold">vs ${match.opponent}</div>
