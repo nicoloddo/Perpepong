@@ -76,8 +76,8 @@ class VirtualMatchViewer extends HTMLElement {
         // Use the block ID as the seed for deterministic player selection
         const selectionRng = new DeterministicRNG(this.currentBlockID);
         
-        // Pick two random players from the top 15 (or all if less than 15)
-        const poolSize = Math.min(classifica.length, 15);
+        // Pick two random players from ALL players (truly random, not ELO-biased)
+        const poolSize = classifica.length;
         const idx1 = selectionRng.nextInt(0, poolSize - 1);
         let idx2 = selectionRng.nextInt(0, poolSize - 1);
         
