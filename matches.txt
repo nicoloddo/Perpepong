@@ -44,3 +44,4 @@ Ted - London: 21-18
 Paolino - Nicoerri: 21-15
 Paolino - Rivio: 21-10
 London - Ted: 17-21
+Ted - Paolino: 4-21
