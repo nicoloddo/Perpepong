@@ -366,10 +366,12 @@ class VirtualMatchViewer extends HTMLElement {
             this.classifica = this.storedClassifica;
         }
         
-        const poolSize = Math.min(this.classifica.length, 15);
+        // Pick two random players from ALL players (truly random, not ELO-biased)
+        const poolSize = this.classifica.length;
         const idx1 = selectionRng.nextInt(0, poolSize - 1);
         let idx2 = selectionRng.nextInt(0, poolSize - 1);
         
+        // Ensure we pick two different players
         while (idx2 === idx1 && poolSize > 1) {
             idx2 = selectionRng.nextInt(0, poolSize - 1);
         }
