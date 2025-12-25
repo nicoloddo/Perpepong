@@ -76,7 +76,7 @@ class HomeView extends HTMLElement {
           </div>
           
           <!-- Expandable stats -->
-          <div id="expandable-stats" class="${this.isExpanded ? '' : 'hidden'} mt-3">
+          <div id="expandable-stats" class="mt-3" style="display: ${this.isExpanded ? 'block' : 'none'}">
             <div class="grid grid-cols-2 gap-3">
               <div class="bg-muted/30 p-4 rounded-xl text-center">
                 <div class="text-3xl font-bold text-primary mb-1">${mediaElo}</div>
@@ -193,11 +193,11 @@ class HomeView extends HTMLElement {
         
         // Toggle visibility
         if (this.isExpanded) {
-          expandableStats.classList.remove('hidden');
+          expandableStats.style.display = 'block';
           toggleText.textContent = 'Nascondi statistiche';
           toggleIcon.classList.add('rotate-180');
         } else {
-          expandableStats.classList.add('hidden');
+          expandableStats.style.display = 'none';
           toggleText.textContent = 'Mostra tutte le statistiche';
           toggleIcon.classList.remove('rotate-180');
         }
