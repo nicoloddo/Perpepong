@@ -3,8 +3,8 @@
  * Displays the application title and subtitle
  * 
  * Attributes:
- * - title: Main title text (default: '🏓 Classifica Perpeponghieri')
- * - subtitle: Subtitle text (default: 'Sistema di Rating ELO')
+ * - title: Main title text (default: '🏓 Perpong')
+ * - subtitle: Subtitle text (default: 'Ping, Pong, Perpong')
  * 
  * Usage:
  * <app-header></app-header>
@@ -12,8 +12,8 @@
  */
 class AppHeader extends HTMLElement {
   connectedCallback() {
-    const title = this.getAttribute('title') || '🏓 Classifica Perpeponghieri';
-    const subtitle = this.getAttribute('subtitle') || 'Sistema di Rating ELO';
+    const title = this.getAttribute('title') || '🏓 Perpong';
+    const subtitle = this.getAttribute('subtitle') || 'Ping, Pong, Perpong';
     
     this.innerHTML = `
       <header class="text-center text-white mb-5 py-5">
