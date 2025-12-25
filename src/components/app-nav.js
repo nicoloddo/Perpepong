@@ -17,7 +17,7 @@ class AppNav extends HTMLElement {
       { id: 'matches', label: 'Partite', href: '../matches/matches.html' },
       { id: 'stats', label: 'Statistiche', href: '../stats/stats.html' },
       { id: 'quote', label: 'Quote', href: '../quote/quote.html' },
-      { id: 'virtualini', label: 'Virtualini', href: '../virtualini/virtualini.html' }
+      { id: 'virtualini', label: 'Virtualini Live', href: '../virtualini/virtualini.html' }
     ];
     
     this.innerHTML = `
