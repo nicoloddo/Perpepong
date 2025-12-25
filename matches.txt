@@ -41,3 +41,6 @@ Sergej - London: 21-12
 Rivio - Nicoerri: 21-14
 Rivio - Ted: 21-19
 Ted - London: 21-18
+Paolino - Nicoerri: 21-15
+Paolino - Rivio: 21-10
+London - Ted: 17-21
