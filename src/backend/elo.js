@@ -392,12 +392,12 @@ function calcolaStatisticheMatchup(partite, classifica) {
 function trovaMatchupInteressanti(partite, classifica) {
     const allMatchups = calcolaStatisticheMatchup(partite, classifica);
     
-    // Filtra matchup con almeno 3 partite per avere statistiche significative
-    const significantMatchups = allMatchups.filter(m => m.totalGames >= 3);
+    // Filtra matchup con almeno 2 partite per avere statistiche significative
+    const significantMatchups = allMatchups.filter(m => m.totalGames >= 2);
     
     // Most balanced: più bilanciato con più partite giocate
     const mostBalanced = [...allMatchups]
-        .filter(m => m.totalGames >= 3)
+        .filter(m => m.totalGames >= 2)
         .sort((a, b) => {
             // Prima ordina per balance score, poi per numero di partite
             if (Math.abs(a.balanceScore - b.balanceScore) < 0.05) {
@@ -408,7 +408,7 @@ function trovaMatchupInteressanti(partite, classifica) {
     
     // Most surprising: prioritize upsets first (underdog winning more), then large discrepancies
     const mostSurprising = [...allMatchups]
-        .filter(m => m.totalGames >= 3)
+        .filter(m => m.totalGames >= 2)
         .map(m => {
             // Determine who is the favorite based on ELO
             const favorite = m.player1WinProb > m.player2WinProb ? 'player1' : 'player2';
@@ -434,9 +434,9 @@ function trovaMatchupInteressanti(partite, classifica) {
         })
         .sort((a, b) => b.surpriseScore - a.surpriseScore)[0];
     
-    // Most dominant: matchup con il win rate più sbilanciato (ma con almeno 3 partite)
+    // Most dominant: matchup con il win rate più sbilanciato (ma con almeno 2 partite)
     const mostDominant = [...allMatchups]
-        .filter(m => m.totalGames >= 3)
+        .filter(m => m.totalGames >= 2)
         .sort((a, b) => {
             const aMax = Math.max(a.player1WinRate, a.player2WinRate);
             const bMax = Math.max(b.player1WinRate, b.player2WinRate);
