@@ -139,10 +139,26 @@ class QuoteView extends HTMLElement {
     // Most Surprising
     if (interestingMatchups.mostSurprising) {
       const m = interestingMatchups.mostSurprising;
-      const actualWinner = m.player1Wins > m.player2Wins ? m.player1 : m.player2;
-      const actualWinRate = Math.max(m.player1WinRate, m.player2WinRate);
-      const expectedWinner = m.player1WinProb > m.player2WinProb ? m.player1 : m.player2;
-      const isUpset = actualWinner !== expectedWinner;
+      
+      // Determine favorite and underdog based on ELO probability
+      const favorite = m.player1WinProb > m.player2WinProb ? m.player1 : m.player2;
+      const underdog = favorite === m.player1 ? m.player2 : m.player1;
+      
+      const favoriteWinRate = favorite === m.player1 ? m.player1WinRate : m.player2WinRate;
+      const underdogWinRate = underdog === m.player1 ? m.player1WinRate : m.player2WinRate;
+      const favoriteWinProb = favorite === m.player1 ? m.player1WinProb : m.player2WinProb;
+      const underdogWinProb = underdog === m.player1 ? m.player1WinProb : m.player2WinProb;
+      
+      const isUpset = underdogWinRate > favoriteWinRate;
+      
+      let description;
+      if (isUpset) {
+        // Upset case: underdog is winning more
+        description = `${underdog} ha vinto nel ${(underdogWinRate * 100).toFixed(0)}% dei casi, ma le quote ELO davano ${(favoriteWinProb * 100).toFixed(0)}% in favore di ${favorite}!`;
+      } else {
+        // No upset but still surprising difference between expected and actual
+        description = `${favorite} ha vinto nel ${(favoriteWinRate * 100).toFixed(0)}% dei casi, ma le quote ELO davano solo ${(favoriteWinProb * 100).toFixed(0)}% di probabilità!`;
+      }
       
       html += `
         <div class="bg-muted/30 rounded-xl p-4 cursor-pointer hover:bg-muted/50 transition-colors" 
@@ -153,32 +169,7 @@ class QuoteView extends HTMLElement {
               <div class="text-sm font-bold text-primary uppercase tracking-wide mb-1">Matchup Più Sorprendente</div>
               <div class="text-lg font-bold mb-1">${m.player1} vs ${m.player2}</div>
               <div class="text-muted-foreground text-sm">
-                ${actualWinner} domina con ${(actualWinRate * 100).toFixed(0)}% win rate, 
-                ma le quote ELO davano ${expectedWinner} favorito!
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-    
-    // Most Played
-    if (interestingMatchups.mostPlayed) {
-      const m = interestingMatchups.mostPlayed;
-      const leader = m.player1Wins > m.player2Wins ? m.player1 : m.player2;
-      const leaderWins = Math.max(m.player1Wins, m.player2Wins);
-      const followerWins = Math.min(m.player1Wins, m.player2Wins);
-      
-      html += `
-        <div class="bg-muted/30 rounded-xl p-4 cursor-pointer hover:bg-muted/50 transition-colors" 
-             onclick="window.location.href=window.getPath('/quote/?player1=${encodeURIComponent(m.player1)}&player2=${encodeURIComponent(m.player2)}')">
-          <div class="flex items-start gap-3">
-            <div class="text-3xl">🔥</div>
-            <div class="flex-1">
-              <div class="text-sm font-bold text-primary uppercase tracking-wide mb-1">Rivalità Più Accesa</div>
-              <div class="text-lg font-bold mb-1">${m.player1} vs ${m.player2}</div>
-              <div class="text-muted-foreground text-sm">
-                ${m.totalGames} partite giocate - ${leader} in vantaggio ${leaderWins}-${followerWins}
+                ${description}
               </div>
             </div>
           </div>
