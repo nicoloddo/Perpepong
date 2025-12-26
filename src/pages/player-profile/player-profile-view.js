@@ -36,15 +36,16 @@ class PlayerProfileView extends HTMLElement {
 
       const playerRank = classifica.findIndex(p => p.nome === playerName) + 1;
       const matchHistory = calcolaStatisticheGiocatore(partite, playerName);
+      const matchupStats = calcolaMatchupGiocatore(partite, playerName, classifica);
 
-      this.render(playerData, playerRank, classifica.length, matchHistory);
+      this.render(playerData, playerRank, classifica.length, matchHistory, matchupStats);
 
     } catch (error) {
       this.innerHTML = `<div class="p-4 bg-destructive text-destructive-foreground rounded-xl text-center">Errore: ${error.message}</div>`;
     }
   }
   
-  render(playerData, rank, totalPlayers, matchHistory) {
+  render(playerData, rank, totalPlayers, matchHistory, matchupStats) {
     const winRate = ((playerData.vittorie / playerData.partiteGiocate) * 100).toFixed(1);
     const avgPointsScored = (playerData.puntiSegnati / playerData.partiteGiocate).toFixed(1);
     const avgPointsConceded = (playerData.puntiSubiti / playerData.partiteGiocate).toFixed(1);
@@ -102,6 +103,18 @@ class PlayerProfileView extends HTMLElement {
 
       <div class="bg-card rounded-2xl shadow-lg overflow-hidden mb-5">
         <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
+          🎯 Statistiche Matchup
+        </div>
+        <div class="p-5 space-y-4">
+          ${this.renderMatchupStat('🏆', 'Miglior Matchup', matchupStats.bestMatchup, playerData.nome)}
+          ${this.renderMatchupStat('😰', 'Peggior Matchup', matchupStats.worstMatchup, playerData.nome)}
+          ${this.renderMatchupStat('💪', 'Maggiore Overperformance', matchupStats.biggestOverperformer, playerData.nome)}
+          ${this.renderMatchupStat('📉', 'Maggiore Underperformance', matchupStats.biggestUnderperformer, playerData.nome)}
+        </div>
+      </div>
+
+      <div class="bg-card rounded-2xl shadow-lg overflow-hidden mb-5">
+        <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
           🏓 Storico Partite
         </div>
         <div class="divide-y divide-border">
@@ -126,6 +139,46 @@ class PlayerProfileView extends HTMLElement {
               </div>
             `;
           }).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  renderMatchupStat(emoji, title, matchup, playerName) {
+    if (!matchup) {
+      return `
+        <div class="bg-muted/30 rounded-xl p-4">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">${emoji}</div>
+            <div class="flex-1">
+              <div class="text-sm font-bold text-primary uppercase tracking-wide mb-1">${title}</div>
+              <div class="text-muted-foreground text-sm">Dati insufficienti (min. 2 partite)</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    const winRatePercent = (matchup.winRate * 100).toFixed(0);
+    const winProbPercent = (matchup.winProb * 100).toFixed(0);
+    const overperformancePercent = (matchup.overperformance * 100).toFixed(0);
+    const overperformanceSign = matchup.overperformance >= 0 ? '+' : '';
+    
+    return `
+      <div class="bg-muted/30 rounded-xl p-4 cursor-pointer hover:bg-muted/50 transition-colors" 
+           onclick="window.location.href=window.getPath('/quote/?player1=${encodeURIComponent(playerName)}&player2=${encodeURIComponent(matchup.opponent)}')">
+        <div class="flex items-start gap-3">
+          <div class="text-3xl">${emoji}</div>
+          <div class="flex-1">
+            <div class="text-sm font-bold text-primary uppercase tracking-wide mb-1">${title}</div>
+            <div class="text-lg font-bold mb-1">vs ${matchup.opponent}</div>
+            <div class="text-muted-foreground text-sm">
+              ${matchup.wins}-${matchup.losses} in ${matchup.totalGames} partite (${winRatePercent}% win rate)
+            </div>
+            <div class="text-muted-foreground text-sm">
+              Previsto: ${winProbPercent}% | Performance: ${overperformanceSign}${overperformancePercent}%
+            </div>
+          </div>
         </div>
       </div>
     `;

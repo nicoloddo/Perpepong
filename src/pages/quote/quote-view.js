@@ -52,11 +52,12 @@ class QuoteView extends HTMLElement {
       <!-- Comparison Content -->
       <div id="comparisonContent" style="display: none;"></div>
 
-      <!-- No Data Message -->
-      <div id="noDataMessage" class="p-10 text-center text-white">
-        Seleziona due giocatori per visualizzare le quote e lo storico
-      </div>
+      <!-- Matchup Statistics -->
+      <div id="matchupStats"></div>
     `;
+    
+    // Render matchup statistics
+    this.renderMatchupStats();
   }
   
   setupEventListeners() {
@@ -80,15 +81,15 @@ class QuoteView extends HTMLElement {
     const player1Name = this.querySelector('#player1Select').value;
     const player2Name = this.querySelector('#player2Select').value;
     const comparisonContent = this.querySelector('#comparisonContent');
-    const noDataMessage = this.querySelector('#noDataMessage');
+    const matchupStats = this.querySelector('#matchupStats');
     
     if (!player1Name || !player2Name || player1Name === player2Name) {
       comparisonContent.style.display = 'none';
-      noDataMessage.style.display = 'block';
+      matchupStats.style.display = 'block';
       return;
     }
     
-    noDataMessage.style.display = 'none';
+    matchupStats.style.display = 'none';
     comparisonContent.style.display = 'block';
     
     const player1Data = this.currentRankings.find(p => p.nome === player1Name);
@@ -96,6 +97,127 @@ class QuoteView extends HTMLElement {
     const h2hStats = this.calculateHeadToHead(player1Name, player2Name);
     
     comparisonContent.innerHTML = this.renderComparison(player1Data, player2Data, h2hStats);
+  }
+  
+  renderMatchupStats() {
+    const matchupStats = this.querySelector('#matchupStats');
+    const interestingMatchups = trovaMatchupInteressanti(this.allMatches, this.currentRankings);
+    
+    let html = `
+      <div class="bg-card rounded-2xl shadow-lg overflow-hidden mb-5">
+        <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
+          📊 Statistiche Matchup Interessanti
+        </div>
+        <div class="p-5 space-y-4">
+    `;
+    
+    // Most Balanced
+    if (interestingMatchups.mostBalanced) {
+      const m = interestingMatchups.mostBalanced;
+      const leader = m.player1Wins > m.player2Wins ? m.player1 : m.player2;
+      const leaderWins = Math.max(m.player1Wins, m.player2Wins);
+      const followerWins = Math.min(m.player1Wins, m.player2Wins);
+      
+      html += `
+        <div class="bg-muted/30 rounded-xl p-4 cursor-pointer hover:bg-muted/50 transition-colors" 
+             onclick="window.location.href=window.getPath('/quote/?player1=${encodeURIComponent(m.player1)}&player2=${encodeURIComponent(m.player2)}')">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">⚖️</div>
+            <div class="flex-1">
+              <div class="text-sm font-bold text-primary uppercase tracking-wide mb-1">Matchup Più Equilibrato</div>
+              <div class="text-lg font-bold mb-1">${m.player1} vs ${m.player2}</div>
+              <div class="text-muted-foreground text-sm">
+                ${leaderWins}-${followerWins} in ${m.totalGames} partite 
+                (${(m.balanceScore * 100).toFixed(0)}% equilibrio)
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Most Surprising
+    if (interestingMatchups.mostSurprising) {
+      const m = interestingMatchups.mostSurprising;
+      const actualWinner = m.player1Wins > m.player2Wins ? m.player1 : m.player2;
+      const actualWinRate = Math.max(m.player1WinRate, m.player2WinRate);
+      const expectedWinner = m.player1WinProb > m.player2WinProb ? m.player1 : m.player2;
+      const isUpset = actualWinner !== expectedWinner;
+      
+      html += `
+        <div class="bg-muted/30 rounded-xl p-4 cursor-pointer hover:bg-muted/50 transition-colors" 
+             onclick="window.location.href=window.getPath('/quote/?player1=${encodeURIComponent(m.player1)}&player2=${encodeURIComponent(m.player2)}')">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">🤯</div>
+            <div class="flex-1">
+              <div class="text-sm font-bold text-primary uppercase tracking-wide mb-1">Matchup Più Sorprendente</div>
+              <div class="text-lg font-bold mb-1">${m.player1} vs ${m.player2}</div>
+              <div class="text-muted-foreground text-sm">
+                ${actualWinner} domina con ${(actualWinRate * 100).toFixed(0)}% win rate, 
+                ma le quote ELO davano ${expectedWinner} favorito!
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Most Played
+    if (interestingMatchups.mostPlayed) {
+      const m = interestingMatchups.mostPlayed;
+      const leader = m.player1Wins > m.player2Wins ? m.player1 : m.player2;
+      const leaderWins = Math.max(m.player1Wins, m.player2Wins);
+      const followerWins = Math.min(m.player1Wins, m.player2Wins);
+      
+      html += `
+        <div class="bg-muted/30 rounded-xl p-4 cursor-pointer hover:bg-muted/50 transition-colors" 
+             onclick="window.location.href=window.getPath('/quote/?player1=${encodeURIComponent(m.player1)}&player2=${encodeURIComponent(m.player2)}')">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">🔥</div>
+            <div class="flex-1">
+              <div class="text-sm font-bold text-primary uppercase tracking-wide mb-1">Rivalità Più Accesa</div>
+              <div class="text-lg font-bold mb-1">${m.player1} vs ${m.player2}</div>
+              <div class="text-muted-foreground text-sm">
+                ${m.totalGames} partite giocate - ${leader} in vantaggio ${leaderWins}-${followerWins}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Most Dominant
+    if (interestingMatchups.mostDominant) {
+      const m = interestingMatchups.mostDominant;
+      const dominant = m.player1WinRate > m.player2WinRate ? m.player1 : m.player2;
+      const dominated = m.player1WinRate > m.player2WinRate ? m.player2 : m.player1;
+      const dominantWinRate = Math.max(m.player1WinRate, m.player2WinRate);
+      const dominantWins = Math.max(m.player1Wins, m.player2Wins);
+      const dominatedWins = Math.min(m.player1Wins, m.player2Wins);
+      
+      html += `
+        <div class="bg-muted/30 rounded-xl p-4 cursor-pointer hover:bg-muted/50 transition-colors" 
+             onclick="window.location.href=window.getPath('/quote/?player1=${encodeURIComponent(m.player1)}&player2=${encodeURIComponent(m.player2)}')">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">👑</div>
+            <div class="flex-1">
+              <div class="text-sm font-bold text-primary uppercase tracking-wide mb-1">Dominio Totale</div>
+              <div class="text-lg font-bold mb-1">${m.player1} vs ${m.player2}</div>
+              <div class="text-muted-foreground text-sm">
+                ${dominant} domina con ${(dominantWinRate * 100).toFixed(0)}% win rate (${dominantWins}-${dominatedWins})
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    html += `
+        </div>
+      </div>
+    `;
+    
+    matchupStats.innerHTML = html;
   }
   
   calculateHeadToHead(player1, player2) {

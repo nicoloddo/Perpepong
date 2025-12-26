@@ -310,3 +310,223 @@ function calcolaStatisticheGiocatore(partite, playerName) {
     return matchHistory;
 }
 
+/**
+ * Calcola le statistiche di tutti i matchup tra giocatori
+ * @param {Array} partite - Array di tutte le partite
+ * @param {Array} classifica - Classifica attuale dei giocatori
+ * @returns {Array} Array di matchup con statistiche
+ */
+function calcolaStatisticheMatchup(partite, classifica) {
+    const matchups = {};
+    
+    // Analizza tutte le partite per costruire statistiche di matchup
+    for (const partita of partite) {
+        const key1 = `${partita.giocatore1}-${partita.giocatore2}`;
+        const key2 = `${partita.giocatore2}-${partita.giocatore1}`;
+        
+        // Usa sempre la chiave con i giocatori in ordine alfabetico per evitare duplicati
+        const sortedKey = [partita.giocatore1, partita.giocatore2].sort().join('-');
+        
+        if (!matchups[sortedKey]) {
+            matchups[sortedKey] = {
+                player1: [partita.giocatore1, partita.giocatore2].sort()[0],
+                player2: [partita.giocatore1, partita.giocatore2].sort()[1],
+                totalGames: 0,
+                player1Wins: 0,
+                player2Wins: 0
+            };
+        }
+        
+        matchups[sortedKey].totalGames++;
+        
+        // Determina chi ha vinto
+        const winner = partita.punteggio1 > partita.punteggio2 ? partita.giocatore1 : partita.giocatore2;
+        if (winner === matchups[sortedKey].player1) {
+            matchups[sortedKey].player1Wins++;
+        } else {
+            matchups[sortedKey].player2Wins++;
+        }
+    }
+    
+    // Converti in array e aggiungi statistiche calcolate
+    const matchupArray = Object.values(matchups).map(matchup => {
+        const player1Data = classifica.find(p => p.nome === matchup.player1);
+        const player2Data = classifica.find(p => p.nome === matchup.player2);
+        
+        // Calcola probabilità basata su ELO
+        const player1WinProb = 1 / (1 + Math.pow(10, (player2Data.elo - player1Data.elo) / 400));
+        const player2WinProb = 1 - player1WinProb;
+        
+        // Calcola win rate attuale
+        const player1WinRate = matchup.player1Wins / matchup.totalGames;
+        const player2WinRate = matchup.player2Wins / matchup.totalGames;
+        
+        // Calcola quanto il win rate è vicino a 0.5 (più vicino = più bilanciato)
+        const balanceScore = 1 - Math.abs(0.5 - player1WinRate);
+        
+        // Calcola la differenza tra win rate attuale e probabilità prevista (sorpresa)
+        const surpriseFactor = Math.abs(player1WinRate - player1WinProb);
+        
+        return {
+            ...matchup,
+            player1Elo: player1Data.elo,
+            player2Elo: player2Data.elo,
+            player1WinRate,
+            player2WinRate,
+            player1WinProb,
+            player2WinProb,
+            balanceScore,
+            surpriseFactor
+        };
+    });
+    
+    return matchupArray;
+}
+
+/**
+ * Trova i matchup più interessanti
+ * @param {Array} partite - Array di tutte le partite
+ * @param {Array} classifica - Classifica attuale dei giocatori
+ * @returns {Object} Oggetto con vari matchup interessanti
+ */
+function trovaMatchupInteressanti(partite, classifica) {
+    const allMatchups = calcolaStatisticheMatchup(partite, classifica);
+    
+    // Filtra matchup con almeno 3 partite per avere statistiche significative
+    const significantMatchups = allMatchups.filter(m => m.totalGames >= 3);
+    
+    // Most balanced: più bilanciato con più partite giocate
+    const mostBalanced = [...allMatchups]
+        .filter(m => m.totalGames >= 3)
+        .sort((a, b) => {
+            // Prima ordina per balance score, poi per numero di partite
+            if (Math.abs(a.balanceScore - b.balanceScore) < 0.05) {
+                return b.totalGames - a.totalGames;
+            }
+            return b.balanceScore - a.balanceScore;
+        })[0];
+    
+    // Most surprising: maggior differenza tra win rate e probabilità
+    const mostSurprising = [...allMatchups]
+        .filter(m => m.totalGames >= 3)
+        .sort((a, b) => b.surpriseFactor - a.surpriseFactor)[0];
+    
+    // Most played: matchup con più partite
+    const mostPlayed = [...allMatchups]
+        .sort((a, b) => b.totalGames - a.totalGames)[0];
+    
+    // Most dominant: matchup con il win rate più sbilanciato (ma con almeno 3 partite)
+    const mostDominant = [...allMatchups]
+        .filter(m => m.totalGames >= 3)
+        .sort((a, b) => {
+            const aMax = Math.max(a.player1WinRate, a.player2WinRate);
+            const bMax = Math.max(b.player1WinRate, b.player2WinRate);
+            return bMax - aMax;
+        })[0];
+    
+    return {
+        mostBalanced,
+        mostSurprising,
+        mostPlayed,
+        mostDominant,
+        allMatchups
+    };
+}
+
+/**
+ * Calcola le statistiche di matchup per un giocatore specifico
+ * @param {Array} partite - Array di tutte le partite
+ * @param {string} playerName - Nome del giocatore
+ * @param {Array} classifica - Classifica attuale dei giocatori
+ * @returns {Object} Statistiche di matchup del giocatore
+ */
+function calcolaMatchupGiocatore(partite, playerName, classifica) {
+    const matchups = {};
+    
+    // Analizza tutte le partite del giocatore
+    for (const partita of partite) {
+        let opponent = null;
+        let isPlayer1 = false;
+        
+        if (partita.giocatore1 === playerName) {
+            opponent = partita.giocatore2;
+            isPlayer1 = true;
+        } else if (partita.giocatore2 === playerName) {
+            opponent = partita.giocatore1;
+            isPlayer1 = false;
+        } else {
+            continue; // Questa partita non coinvolge il giocatore
+        }
+        
+        if (!matchups[opponent]) {
+            matchups[opponent] = {
+                opponent,
+                wins: 0,
+                losses: 0,
+                totalGames: 0
+            };
+        }
+        
+        matchups[opponent].totalGames++;
+        
+        const won = isPlayer1 
+            ? partita.punteggio1 > partita.punteggio2 
+            : partita.punteggio2 > partita.punteggio1;
+        
+        if (won) {
+            matchups[opponent].wins++;
+        } else {
+            matchups[opponent].losses++;
+        }
+    }
+    
+    // Converti in array e aggiungi statistiche
+    const matchupArray = Object.values(matchups).map(matchup => {
+        const playerData = classifica.find(p => p.nome === playerName);
+        const opponentData = classifica.find(p => p.nome === matchup.opponent);
+        
+        const winRate = matchup.wins / matchup.totalGames;
+        
+        // Calcola probabilità basata su ELO
+        const winProb = opponentData 
+            ? 1 / (1 + Math.pow(10, (opponentData.elo - playerData.elo) / 400))
+            : 0.5;
+        
+        // Performance vs expectation
+        const overperformance = winRate - winProb;
+        
+        return {
+            ...matchup,
+            opponentElo: opponentData ? opponentData.elo : 1500,
+            winRate,
+            winProb,
+            overperformance
+        };
+    });
+    
+    // Trova best e worst matchup (con almeno 2 partite)
+    const significantMatchups = matchupArray.filter(m => m.totalGames >= 2);
+    
+    const bestMatchup = [...significantMatchups]
+        .sort((a, b) => b.winRate - a.winRate)[0];
+    
+    const worstMatchup = [...significantMatchups]
+        .sort((a, b) => a.winRate - b.winRate)[0];
+    
+    // Biggest overperformer
+    const biggestOverperformer = [...significantMatchups]
+        .sort((a, b) => b.overperformance - a.overperformance)[0];
+    
+    // Biggest underperformer
+    const biggestUnderperformer = [...significantMatchups]
+        .sort((a, b) => a.overperformance - b.overperformance)[0];
+    
+    return {
+        bestMatchup,
+        worstMatchup,
+        biggestOverperformer,
+        biggestUnderperformer,
+        allMatchups: matchupArray
+    };
+}
+
