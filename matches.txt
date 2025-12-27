@@ -54,4 +54,5 @@ Paolino - London: 21-12
 Paolino - Sergej: 21-16
 Paolino - Ted: 21-19
 London - Sergej: 21-15
-Sergej - Ted 21-10
+Sergej - Ted: 21-10
+Sergej - London: 21-18
