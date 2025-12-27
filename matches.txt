@@ -49,3 +49,6 @@ Rivio - Paolino: 22-20
 London - Rivio: 21-12
 London - Nicoerri: 18-21
 Nicoerri - Paolino: 4-11
+London - Ted: 21-8
+Paolino - London: 21-12
+Paolino - Sergej: 21-16
