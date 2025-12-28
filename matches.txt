@@ -60,3 +60,9 @@ London - Nicoerri: 21-11
 London - Nicoerri: 21-13
 Nicoerri - Ted: 21-19
 Paolino - Ted: 21-13
+Ted - London: 21-19
+Paolino - Rivio: 21-13
+Rivio - Nicoerri: 21-10
+Rivio - Nicoerri: 21-16
+Rivio - Nicoerri: 21-12
+Rivio - Nicoerri: 21-10
