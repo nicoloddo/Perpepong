@@ -112,7 +112,7 @@ class UserProfileButton extends HTMLElement {
       this.innerHTML = `
         <button
           id="login-btn"
-          class="px-4 py-2 bg-perpe-purple text-white rounded-lg hover:opacity-90 transition shadow-md hover:shadow-lg font-medium text-sm"
+          class="px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-white rounded-lg hover:opacity-90 transition shadow-md hover:shadow-lg font-medium text-sm"
           aria-label="Login"
         >
           Login

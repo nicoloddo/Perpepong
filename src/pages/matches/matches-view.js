@@ -6,7 +6,23 @@
  * Usage:
  * <matches-view></matches-view>
  */
+
+import { getCurrentUser } from '../../backend/auth.js';
+
 class MatchesView extends HTMLElement {
+  async handleAddMatch() {
+    // Check if user is logged in
+    const { user } = await getCurrentUser();
+    
+    if (!user) {
+      // Not logged in - redirect to auth page
+      window.location.href = window.getPath('/auth/');
+    } else {
+      // Logged in - go to add match page
+      window.location.href = window.getPath('/add-match/');
+    }
+  }
+
   async connectedCallback() {
     this.innerHTML = `
       <div class="bg-card rounded-2xl shadow-lg overflow-hidden mb-5">
@@ -51,8 +67,9 @@ class MatchesView extends HTMLElement {
       this.innerHTML = `
         <div class="mb-4">
           <button 
-            onclick="window.location.href=window.getPath('/add-match/')"
-            class="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold py-4 px-6 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2">
+            id="add-match-btn"
+            class="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+            style="padding: 0.5rem 1.5rem;">
             + Aggiungi Partita
           </button>
         </div>
@@ -65,6 +82,12 @@ class MatchesView extends HTMLElement {
           </div>
         </div>
       `;
+      
+      // Attach event listener to add match button
+      const addMatchBtn = this.querySelector('#add-match-btn');
+      if (addMatchBtn) {
+        addMatchBtn.addEventListener('click', () => this.handleAddMatch());
+      }
       
     } catch (error) {
       this.innerHTML = `
