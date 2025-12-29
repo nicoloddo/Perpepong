@@ -39,13 +39,13 @@ export async function fetchMatchesFromSupabase() {
 
 /**
  * Fetches all players from Supabase
- * @returns {Promise<Array>} Array of player usernames
+ * @returns {Promise<Array>} Array of player objects with username and email
  */
 export async function fetchPlayersFromSupabase() {
     try {
         const { data, error } = await supabase
             .from('giocatori')
-            .select('username')
+            .select('username, email')
             .order('username', { ascending: true });
         
         if (error) {
@@ -58,6 +58,35 @@ export async function fetchPlayersFromSupabase() {
     } catch (error) {
         console.error('Error fetching players from Supabase:', error);
         throw error;
+    }
+}
+
+/**
+ * Finds a player by email
+ * @param {string} email - The user's email address
+ * @returns {Promise<Object|null>} Player object or null if not found
+ */
+export async function findPlayerByEmail(email) {
+    try {
+        const { data, error } = await supabase
+            .from('giocatori')
+            .select('username, email')
+            .eq('email', email)
+            .single();
+        
+        if (error) {
+            // Return null if player not found, don't log error
+            if (error.code === 'PGRST116') {
+                return null;
+            }
+            console.error('Supabase error:', error);
+            throw error;
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Error finding player by email:', error);
+        return null;
     }
 }
 

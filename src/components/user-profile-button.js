@@ -9,6 +9,7 @@
  */
 
 import { getCurrentUser, signOut, onAuthStateChange } from '../backend/auth.js';
+import { findPlayerByEmail } from '../backend/supabase.js';
 
 class UserProfileButton extends HTMLElement {
   constructor() {
@@ -78,6 +79,33 @@ class UserProfileButton extends HTMLElement {
       
       // Reload page to clear any user-specific data
       window.location.reload();
+    }
+  }
+
+  async handleProfileClick() {
+    if (!this.user || !this.user.email) {
+      alert('Unable to load profile: no email found');
+      return;
+    }
+
+    // Close menu and show loading state
+    this.menuOpen = false;
+    this.render();
+
+    try {
+      // Find player by email
+      const player = await findPlayerByEmail(this.user.email);
+      
+      if (player && player.username) {
+        // Navigate to player profile
+        window.location.href = window.getPath(`/player-profile/?player=${encodeURIComponent(player.username)}`);
+      } else {
+        // Player not found
+        alert('Non sei ancora associato a un giocatore. Contatta l\'amministratore per collegare il tuo account.');
+      }
+    } catch (error) {
+      console.error('Error loading player profile:', error);
+      alert('Errore nel caricamento del profilo. Riprova più tardi.');
     }
   }
 
@@ -205,11 +233,8 @@ class UserProfileButton extends HTMLElement {
       signoutBtn?.addEventListener('click', () => this.handleSignOut());
 
       const profileBtn = this.querySelector('#profile-menu-item');
-      profileBtn?.addEventListener('click', () => {
-        // Navigate to profile page (to be implemented)
-        alert('Profile page coming soon!');
-        this.menuOpen = false;
-        this.render();
+      profileBtn?.addEventListener('click', async () => {
+        await this.handleProfileClick();
       });
 
       const settingsBtn = this.querySelector('#settings-menu-item');
