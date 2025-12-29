@@ -76,3 +76,61 @@ export function transformSupabaseMatchesToEloFormat(supabaseMatches) {
         timestamp: match.match_timestamp
     }));
 }
+
+/**
+ * Inserts a new match into Supabase
+ * @param {Object} matchData - Match data
+ * @param {string} matchData.player1 - First player name
+ * @param {string} matchData.player2 - Second player name
+ * @param {number} matchData.score1 - First player score
+ * @param {number} matchData.score2 - Second player score
+ * @param {string} matchData.matchType - Match type (single-21 or single-11)
+ * @returns {Promise<Object>} Inserted match data
+ */
+export async function insertMatchToSupabase(matchData) {
+    try {
+        // Get current timestamp in Rome timezone
+        const now = new Date();
+        const romeTimezone = 'Europe/Rome';
+        const formatter = new Intl.DateTimeFormat('sv-SE', {
+            timeZone: romeTimezone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+        
+        const parts = formatter.formatToParts(now);
+        const dateStr = `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}-${parts.find(p => p.type === 'day').value}`;
+        const timeStr = `${parts.find(p => p.type === 'hour').value}:${parts.find(p => p.type === 'minute').value}:${parts.find(p => p.type === 'second').value}`;
+        const timestampStr = `${dateStr} ${timeStr}+01:00`; // Rome timezone offset
+        
+        const { data, error } = await supabase
+            .from('partite')
+            .insert([
+                {
+                    player1: matchData.player1,
+                    player2: matchData.player2,
+                    score1: matchData.score1,
+                    score2: matchData.score2,
+                    match_type: matchData.matchType,
+                    match_timestamp: timestampStr
+                }
+            ])
+            .select();
+        
+        if (error) {
+            console.error('Supabase insert error:', error);
+            throw error;
+        }
+        
+        console.log('Match inserted successfully:', data);
+        return data[0];
+    } catch (error) {
+        console.error('Error inserting match to Supabase:', error);
+        throw error;
+    }
+}
