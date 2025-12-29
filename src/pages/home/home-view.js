@@ -164,10 +164,7 @@ class HomeView extends HTMLElement {
           
           <!-- Expand/Collapse Button -->
           <button id="toggle-stats-btn" class="mt-3 py-2 px-4 bg-primary text-primary-foreground text-sm font-semibold rounded-lg shadow-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto">
-            <span id="toggle-text">${this.isExpanded ? 'Nascondi statistiche' : 'Mostra tutte le statistiche'}</span>
-            <svg id="toggle-icon" class="w-4 h-4 transition-transform ${this.isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
+            <span id="toggle-text">${this.isExpanded ? '▲ Nascondi statistiche' : '▼ Mostra tutte le statistiche'}</span>
           </button>
         </div>
       </div>
@@ -185,7 +182,6 @@ class HomeView extends HTMLElement {
     const toggleBtn = this.querySelector('#toggle-stats-btn');
     const expandableStats = this.querySelector('#expandable-stats');
     const toggleText = this.querySelector('#toggle-text');
-    const toggleIcon = this.querySelector('#toggle-icon');
     
     if (toggleBtn && expandableStats) {
       toggleBtn.addEventListener('click', () => {
@@ -194,12 +190,10 @@ class HomeView extends HTMLElement {
         // Toggle visibility
         if (this.isExpanded) {
           expandableStats.style.display = 'block';
-          toggleText.textContent = 'Nascondi statistiche';
-          toggleIcon.classList.add('rotate-180');
+          toggleText.textContent = '▲ Nascondi statistiche';
         } else {
           expandableStats.style.display = 'none';
-          toggleText.textContent = 'Mostra tutte le statistiche';
-          toggleIcon.classList.remove('rotate-180');
+          toggleText.textContent = '▼ Mostra tutte le statistiche';
         }
       });
     }

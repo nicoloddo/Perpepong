@@ -49,6 +49,13 @@ class MatchesView extends HTMLElement {
       }).join('');
       
       this.innerHTML = `
+        <div class="mb-4">
+          <button 
+            onclick="window.location.href=window.getPath('/add-match/')"
+            class="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold py-4 px-6 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2">
+            + Aggiungi Partita
+          </button>
+        </div>
         <div class="bg-card rounded-2xl shadow-lg overflow-hidden mb-5">
           <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
             Tutte le Partite

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Auth Button</title>
+    <link rel="stylesheet" href="./src/shared/output.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .test-box {
+            border: 2px dashed yellow;
+            padding: 20px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="test-box">
+        <h2 class="text-white text-xl mb-4">Testing Auth Button Size and Position</h2>
+        <p class="text-white mb-4">The button should be 16px x 16px (very small) in the top-right corner</p>
+    </div>
+
+    <div class="container mx-auto max-w-full">
+        <app-header></app-header>
+        
+        <div class="test-box">
+            <p class="text-white">If the button is overlapping the title, try:</p>
+            <ul class="text-white list-disc ml-6">
+                <li>Hard refresh: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)</li>
+                <li>Clear browser cache</li>
+                <li>Open in incognito/private window</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="./src/shared/base-path.js"></script>
+    <script type="module" src="./src/components/register.js"></script>
+    <script>
+        console.log('Test page loaded');
+        setTimeout(() => {
+            const userButton = document.querySelector('user-profile-button');
+            const buttonWrapper = document.querySelector('header > div');
+            const button = document.querySelector('user-profile-button button');
+            
+            console.log('=== DEBUG INFO ===');
+            
+            if (buttonWrapper) {
+                const wrapperStyle = window.getComputedStyle(buttonWrapper);
+                console.log('Wrapper position:', wrapperStyle.position);
+                console.log('Wrapper top:', wrapperStyle.top);
+                console.log('Wrapper right:', wrapperStyle.right);
+                console.log('Wrapper left:', wrapperStyle.left);
+                const wrapperRect = buttonWrapper.getBoundingClientRect();
+                console.log('Wrapper rect:', wrapperRect);
+            }
+            
+            if (button) {
+                const size = button.getBoundingClientRect();
+                console.log('Button size:', size.width, 'x', size.height);
+                console.log('Button position:', size.left, size.top);
+                console.log('Button classes:', button.className);
+            }
+            
+            if (userButton) {
+                const userStyle = window.getComputedStyle(userButton);
+                console.log('user-profile-button display:', userStyle.display);
+            }
+        }, 500);
+    </script>
+</body>
+</html>

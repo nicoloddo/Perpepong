@@ -16,7 +16,7 @@ class AppNav extends HTMLElement {
       { id: 'home', label: 'Classifica', href: window.getPath('/') },
       { id: 'matches', label: 'Partite', href: window.getPath('/matches/') },
       { id: 'quote', label: 'Quote', href: window.getPath('/quote/') },
-      { id: 'virtualini', label: 'Virtualini Live', href: window.getPath('/virtualini/') }
+      { id: 'virtualini', label: 'Virtualini', href: window.getPath('/virtualini/') }
     ];
     
     this.innerHTML = `
