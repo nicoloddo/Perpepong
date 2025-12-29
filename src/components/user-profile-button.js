@@ -143,40 +143,43 @@ class UserProfileButton extends HTMLElement {
           </button>
 
           ${this.menuOpen ? `
-            <div class="absolute right-0 mt-2 w-56 bg-card rounded-xl shadow-xl border border-border overflow-hidden z-50">
-              <div class="p-3 border-b border-border">
-                <p class="text-sm font-medium text-foreground">${displayName}</p>
-                <p class="text-xs text-foreground-light truncate">${this.user.email || ''}</p>
+            <div class="absolute right-0 mt-2 w-56 rounded-xl shadow-xl overflow-hidden z-50" style="background-color: white; border: 2px solid black;">
+              <div class="p-3 border-b" style="background-color: #f9fafb; border-color: black;">
+                <p class="text-sm font-medium" style="color: #374151;">${displayName}</p>
+                <p class="text-xs truncate" style="color: #374151;">${this.user.email || ''}</p>
               </div>
               
-              <div class="p-2">
+              <div class="p-2" style="background-color: white;">
                 <button
                   id="profile-menu-item"
-                  class="w-full text-left px-3 py-2 rounded-lg hover:bg-surface-100 transition text-sm text-foreground flex items-center gap-2"
+                  class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-sm flex items-center gap-2"
+                  style="color: #374151;"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                   </svg>
-                  Profile
+                  Profilo
                 </button>
                 
                 <button
                   id="settings-menu-item"
-                  class="w-full text-left px-3 py-2 rounded-lg hover:bg-surface-100 transition text-sm text-foreground flex items-center gap-2"
+                  class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-sm flex items-center gap-2"
+                  style="color: #374151;"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M12 1v6m0 6v6m5.196-15.196l-4.242 4.242m0 6.364l-4.242 4.242m15.196-5.196h-6m-6 0H1"></path>
                   </svg>
-                  Settings
+                  Impostazioni
                 </button>
               </div>
 
-              <div class="p-2 border-t border-border">
+              <div class="p-2 border-t" style="background-color: white; border-color: black;">
                 <button
                   id="signout-btn"
-                  class="w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 transition text-sm text-red-600 flex items-center gap-2"
+                  class="w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 transition text-sm flex items-center gap-2"
+                  style="color: #dc2626;"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
