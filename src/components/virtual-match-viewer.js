@@ -265,7 +265,7 @@ class VirtualMatchViewer extends HTMLElement {
                 </div>
                 
                 <!-- Pong Game Canvas -->
-                <div class="mt-6">
+                <div>
                     <canvas id="pongCanvas" 
                             width="600" 
                             height="300" 
@@ -322,7 +322,7 @@ class VirtualMatchViewer extends HTMLElement {
                 </div>
                 
                 <!-- Pong Game Canvas -->
-                <div class="mt-6">
+                <div>
                     <canvas id="pongCanvas" 
                             width="600" 
                             height="300" 
