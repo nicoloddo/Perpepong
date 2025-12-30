@@ -45,7 +45,8 @@ class MatchDetailView extends HTMLElement {
         elo1Before: player1Elo,
         elo2Before: player2Elo,
         details1: dettagli1,
-        details2: dettagli2
+        details2: dettagli2,
+        timestamp: partita.timestamp || null
       });
       
       this.appendChild(matchCard);

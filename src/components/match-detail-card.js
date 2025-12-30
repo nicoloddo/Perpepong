@@ -28,12 +28,33 @@ class MatchDetailCard extends HTMLElement {
   render() {
     if (!this.matchData) return;
     
-    const { matchNumber, player1, player2, score1, score2, elo1Before, elo2Before, details1, details2 } = this.matchData;
+    const { matchNumber, player1, player2, score1, score2, elo1Before, elo2Before, details1, details2, timestamp } = this.matchData;
     const winner = score1 > score2 ? 1 : 2;
+    
+    // Format date from timestamp
+    let dateDisplay = '';
+    if (timestamp) {
+      try {
+        const date = new Date(timestamp);
+        // Check if date is valid
+        if (!isNaN(date.getTime())) {
+          const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+          dateDisplay = date.toLocaleString('it-IT', options);
+        } else {
+          console.warn('Invalid timestamp:', timestamp);
+        }
+      } catch (e) {
+        console.error('Error parsing date:', e, 'Timestamp:', timestamp);
+      }
+    }
+    
+    // Always show matchup link
+    const matchupLink = `/quote/?player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}`;
     
     this.innerHTML = `
       <div class="bg-card rounded-2xl p-5 mb-4 shadow-lg text-center">
-        <div class="text-2xl font-bold mb-4">Partita #${matchNumber}</div>
+        <div class="text-2xl font-bold mb-2">Partita #${matchNumber}</div>
+        ${dateDisplay ? `<div class="text-muted-foreground text-sm mb-4">${dateDisplay}</div>` : ''}
         <div class="flex justify-between items-center gap-3">
           <div class="flex-1">
             <div class="text-lg font-bold mb-2 ${winner === 1 ? 'text-primary' : ''}">${player1}</div>
@@ -47,11 +68,16 @@ class MatchDetailCard extends HTMLElement {
             <div class="text-muted-foreground text-sm">ELO Iniziale: ${elo2Before}</div>
           </div>
         </div>
+        <div class="mt-4 pt-4 border-t border-border">
+          <a href="#" onclick="event.preventDefault(); window.location.href=window.getPath('${matchupLink}');" class="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-4 py-2 rounded-lg font-semibold shadow-md transition-all active:scale-95 hover:shadow-lg">
+            📊 Vedi Matchup
+          </a>
+        </div>
       </div>
 
       <div class="bg-card rounded-2xl p-4 mb-4 shadow-lg">
         <div class="text-xl text-primary font-bold mb-4 pb-2 border-b-2 border-primary">
-          📊 Calcolo Dettagliato ELO
+          🧮 Calcolo Dettagliato ELO
         </div>
         
         <div class="flex flex-col gap-4 mb-4">
