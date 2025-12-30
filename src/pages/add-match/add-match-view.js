@@ -55,65 +55,76 @@ class AddMatchView extends HTMLElement {
             Aggiungi Nuova Partita
           </div>
           
-          <form id="add-match-form" class="p-6 space-y-8">
-            <!-- Player 1 -->
-            <div>
-              <label for="player1" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                Giocatore 1
-              </label>
-              <select 
-                id="player1" 
-                name="player1" 
-                required
-                class="mb-4 w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground cursor-pointer focus:outline-none focus:border-primary transition-colors">
-                <option value="">Seleziona giocatore</option>
-                ${playersOptions}
-              </select>
+          <form id="add-match-form" class="p-6 space-y-6">
+            <!-- Player Selection -->
+            <div class="grid grid-cols-[1fr_auto_1fr] gap-0.5">
+              <div class="flex flex-col gap-2">
+                <select 
+                  id="player1" 
+                  name="player1" 
+                  required
+                  class="w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground cursor-pointer focus:outline-none focus:border-primary transition-colors text-center">
+                  <option value="">Seleziona...</option>
+                  ${playersOptions}
+                </select>
+              </div>
+              <div class="flex items-end py-2">
+                <div class="text-xl font-bold text-primary text-center px-2">VS</div>
+              </div>
+              <div class="flex flex-col gap-2">
+                <select 
+                  id="player2" 
+                  name="player2" 
+                  required
+                  class="w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground cursor-pointer focus:outline-none focus:border-primary transition-colors text-center">
+                  <option value="">Seleziona...</option>
+                  ${playersOptions}
+                </select>
+              </div>
             </div>
             
-            <!-- Score 1 -->
-            <div>
-              <label for="score1" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                Punteggio Giocatore 1
-              </label>
+            <!-- Score Inputs -->
+            <div class="grid grid-cols-[1fr_auto_1fr] gap-1">
               <input 
                 type="number" 
                 id="score1" 
                 name="score1" 
                 min="0" 
                 max="30"
+                value="0"
                 required
-                class="mb-4 w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground focus:outline-none focus:border-primary transition-colors">
-            </div>
-            
-            <!-- Player 2 -->
-            <div>
-              <label for="player2" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                Giocatore 2
-              </label>
-              <select 
-                id="player2" 
-                name="player2" 
-                required
-                class="mb-4 w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground cursor-pointer focus:outline-none focus:border-primary transition-colors">
-                <option value="">Seleziona giocatore</option>
-                ${playersOptions}
-              </select>
-            </div>
-            
-            <!-- Score 2 -->
-            <div>
-              <label for="score2" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                Punteggio Giocatore 2
-              </label>
+                class="w-full p-4 border-2 border-border rounded-xl font-bold text-4xl bg-card text-card-foreground text-center focus:outline-none focus:border-primary transition-colors"
+                style="appearance: textfield; -moz-appearance: textfield;">
+              <div class="flex items-center">
+                <div class="text-3xl font-bold text-muted-foreground text-center px-2">-</div>
+              </div>
               <input 
                 type="number" 
                 id="score2" 
                 name="score2" 
                 min="0" 
                 max="30"
+                value="0"
                 required
-                class="mb-4 w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground focus:outline-none focus:border-primary transition-colors">
+                class="w-full p-4 border-2 border-border rounded-xl font-bold text-4xl bg-card text-card-foreground text-center focus:outline-none focus:border-primary transition-colors"
+                style="appearance: textfield; -moz-appearance: textfield;">
+            </div>
+            
+            <!-- Plus Buttons -->
+            <div class="grid grid-cols-[1fr_auto_1fr] gap-4">
+              <button 
+                type="button" 
+                id="score1-plus"
+                class="w-full bg-gradient-to-br from-green-200 to-green-100 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-200 active:scale-95 text-3xl">
+                ➕
+              </button>
+              <div></div>
+              <button 
+                type="button" 
+                id="score2-plus"
+                class="w-full bg-gradient-to-br from-green-200 to-green-100 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-200 active:scale-95 text-3xl">
+                ➕
+              </button>
             </div>
             
             <!-- Match Type -->
@@ -178,6 +189,67 @@ class AddMatchView extends HTMLElement {
     if (form) {
       form.addEventListener('submit', (e) => this.handleSubmit(e));
     }
+    
+    // Score plus buttons
+    const score1Input = this.querySelector('#score1');
+    const score1Plus = this.querySelector('#score1-plus');
+    
+    if (score1Plus && score1Input) {
+      score1Plus.addEventListener('click', () => {
+        const currentValue = parseInt(score1Input.value) || 0;
+        if (currentValue < 30) {
+          score1Input.value = currentValue + 1;
+        }
+      });
+    }
+    
+    const score2Input = this.querySelector('#score2');
+    const score2Plus = this.querySelector('#score2-plus');
+    
+    if (score2Plus && score2Input) {
+      score2Plus.addEventListener('click', () => {
+        const currentValue = parseInt(score2Input.value) || 0;
+        if (currentValue < 30) {
+          score2Input.value = currentValue + 1;
+        }
+      });
+    }
+    
+    // Prevent same player selection
+    const player1Select = this.querySelector('#player1');
+    const player2Select = this.querySelector('#player2');
+    
+    if (player1Select && player2Select) {
+      player1Select.addEventListener('change', () => {
+        this.updatePlayerOptions();
+      });
+      
+      player2Select.addEventListener('change', () => {
+        this.updatePlayerOptions();
+      });
+    }
+  }
+  
+  updatePlayerOptions() {
+    const player1Select = this.querySelector('#player1');
+    const player2Select = this.querySelector('#player2');
+    
+    if (!player1Select || !player2Select) return;
+    
+    const player1Value = player1Select.value;
+    const player2Value = player2Select.value;
+    
+    // Update player2 options
+    Array.from(player2Select.options).forEach(option => {
+      if (option.value === '') return; // Skip the "Seleziona..." option
+      option.disabled = option.value === player1Value;
+    });
+    
+    // Update player1 options
+    Array.from(player1Select.options).forEach(option => {
+      if (option.value === '') return; // Skip the "Seleziona..." option
+      option.disabled = option.value === player2Value;
+    });
   }
   
   async handleSubmit(event) {
