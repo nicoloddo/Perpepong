@@ -38,6 +38,58 @@ export async function fetchMatchesFromSupabase() {
 }
 
 /**
+ * Fetches total count of matches from Supabase
+ * @returns {Promise<number>} Total number of matches
+ */
+export async function fetchMatchesCount() {
+    try {
+        const { count, error } = await supabase
+            .from('partite')
+            .select('*', { count: 'exact', head: true });
+        
+        if (error) {
+            console.error('Supabase count error:', error);
+            throw error;
+        }
+        
+        console.log('Total matches count:', count);
+        return count || 0;
+    } catch (error) {
+        console.error('Error fetching matches count from Supabase:', error);
+        throw error;
+    }
+}
+
+/**
+ * Fetches paginated matches from Supabase using range
+ * Note: Supabase range is inclusive on both ends, so range(10, 13) returns 4 rows
+ * @param {number} startIndex - Starting index (inclusive)
+ * @param {number} stopIndex - Ending index (inclusive)
+ * @param {boolean} ascending - Sort order (default: false for newest first)
+ * @returns {Promise<Array>} Array of match objects from database
+ */
+export async function fetchMatchesPaginated(startIndex, stopIndex, ascending = false) {
+    try {
+        const { data, error } = await supabase
+            .from('partite')
+            .select('*')
+            .order('match_timestamp', { ascending })
+            .range(startIndex, stopIndex);
+        
+        if (error) {
+            console.error('Supabase paginated fetch error:', error);
+            throw error;
+        }
+        
+        console.log(`Matches loaded (range ${startIndex}-${stopIndex}):`, data?.length || 0);
+        return data || [];
+    } catch (error) {
+        console.error('Error fetching paginated matches from Supabase:', error);
+        throw error;
+    }
+}
+
+/**
  * Fetches all players from Supabase
  * @returns {Promise<Array>} Array of player objects with username and email
  */

@@ -46,6 +46,47 @@ export async function caricaPartite() {
 }
 
 /**
+ * Carica il numero totale di partite da Supabase
+ * @returns {Promise<number>} Total number of matches
+ */
+export async function caricaConteggioPartite() {
+    try {
+        const { fetchMatchesCount } = await import('./supabase.js');
+        const count = await fetchMatchesCount();
+        console.log('Conteggio totale partite:', count);
+        return count;
+    } catch (error) {
+        console.error('Errore nel caricamento del conteggio partite:', error);
+        throw error;
+    }
+}
+
+/**
+ * Carica partite paginate da Supabase
+ * @param {number} startIndex - Starting index (inclusive)
+ * @param {number} stopIndex - Ending index (inclusive)
+ * @param {boolean} ascending - Sort order (default: false for newest first)
+ * @returns {Promise<Array>} Array of match objects in elo.js format
+ */
+export async function caricaPartitePaginate(startIndex, stopIndex, ascending = false) {
+    try {
+        const { fetchMatchesPaginated, transformSupabaseMatchesToEloFormat } = await import('./supabase.js');
+        
+        // Fetch paginated matches from Supabase
+        const supabaseMatches = await fetchMatchesPaginated(startIndex, stopIndex, ascending);
+        
+        // Transform to elo.js format
+        const partite = transformSupabaseMatchesToEloFormat(supabaseMatches);
+        
+        console.log('Partite paginate caricate:', partite.length);
+        return partite;
+    } catch (error) {
+        console.error('Errore nel caricamento delle partite paginate:', error);
+        throw error;
+    }
+}
+
+/**
  * [LEGACY] Carica e processa le partite dal file matches.txt
  * Kept for backward compatibility or fallback
  */
