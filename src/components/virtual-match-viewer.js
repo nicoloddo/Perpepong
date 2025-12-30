@@ -227,8 +227,6 @@ class VirtualMatchViewer extends HTMLElement {
      * @param {Object} state - Match state
      */
     renderPlayingPoint(state) {
-        const progress = state.progress * 100;
-        
         this.innerHTML = `
             <div class="bg-card p-6 rounded-xl shadow-lg space-y-6 mb-8">
                 <!-- Header -->
@@ -264,11 +262,6 @@ class VirtualMatchViewer extends HTMLElement {
                         <div class="text-xs text-muted-foreground mb-1 sm:mb-2">ELO: ${this.match.playerB.elo}</div>
                         <div class="text-xs font-semibold text-primary" style="visibility: ${state.server === "B" ? "visible" : "hidden"}">🎾</div>
                     </div>
-                </div>
-                
-                <!-- Progress Bar -->
-                <div class="w-full bg-accent rounded-full h-2 overflow-hidden">
-                    <div class="bg-primary h-full transition-all duration-100" style="width: ${progress}%"></div>
                 </div>
                 
                 <!-- Pong Game Canvas -->
