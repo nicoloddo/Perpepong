@@ -25,6 +25,7 @@ This document explains the architecture patterns and conventions used in this pr
 4. **Declarative HTML** - Pages are clean, no inline scripts
 5. **Clear separation** - Shared vs page-specific components
 6. **Consistent naming** - Files match their purpose and location
+7. **Rebuild the CSS** - When changes are done to the UI, rebuild the css with npm run build:css to ensure the tailwind classes are available and applied
 
 ---
 
@@ -258,7 +259,7 @@ function visualizzaClassifica(classifica) {
  <title>Page Title</title>
  <link rel="stylesheet" href="./src/shared/output.css">
 </head>
-<body class="min-h-screen p-3 pb-20">
+<body class="min-h-screen p-3 pb-24">
  <div class="container mx-auto max-w-full">
  <app-header></app-header>
  <page-name-view></page-name-view>
@@ -284,7 +285,7 @@ function visualizzaClassifica(classifica) {
  <title>Page Title</title>
  <link rel="stylesheet" href="../src/shared/output.css">
 </head>
-<body class="min-h-screen p-3 pb-20">
+<body class="min-h-screen p-3 pb-24">
  <div class="container mx-auto max-w-full">
  <app-header></app-header>
  <page-name-view></page-name-view>
@@ -330,7 +331,7 @@ Follow this checklist:
  <title>Page Title</title>
  <link rel="stylesheet" href="/src/shared/output.css">
  </head>
- <body class="min-h-screen p-3 pb-20">
+ <body class="min-h-screen p-3 pb-24">
  <div class="container mx-auto max-w-full">
  <app-header></app-header>
  <page-name-view></page-name-view>
