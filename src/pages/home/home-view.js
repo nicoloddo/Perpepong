@@ -72,6 +72,16 @@ class HomeView extends HTMLElement {
       .slice(0, 5);
 
     this.innerHTML = `
+      <!-- Add Match Button - First Thing on Page -->
+      <div class="mb-5">
+        <button 
+          id="add-match-btn-classifica"
+          class="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+          style="padding: 0.75rem 1.5rem; font-size: 1.125rem;">
+          + Aggiungi Partita
+        </button>
+      </div>
+
       <!-- Stats Section -->
       <div class="bg-card rounded-2xl shadow-lg overflow-hidden mb-5">
         <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
@@ -189,14 +199,6 @@ class HomeView extends HTMLElement {
       <div class="bg-card rounded-2xl shadow-lg overflow-hidden mb-5">
         <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
           Classifica Giocatori
-        </div>
-        <div class="p-4">
-          <button 
-            id="add-match-btn-classifica"
-            class="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
-            style="padding: 0.5rem 1.5rem;">
-            + Aggiungi Partita
-          </button>
         </div>
         <players-ranking class="divide-y divide-border"></players-ranking>
       </div>
