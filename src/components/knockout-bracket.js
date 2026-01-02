@@ -90,8 +90,16 @@ class KnockoutBracket extends HTMLElement {
   
   renderNode(node) {
     const players = node.players || [];
-    const player1 = players[0] || 'In attesa...';
-    const player2 = players[1] || 'In attesa...';
+    const player1 = players[0] || '';
+    const player2 = players[1] || '';
+    const tournamentId = this.getAttribute('tournament-id');
+    
+    // Only allow clicking if both players are present
+    const canViewMatches = player1 && player2;
+    const clickHandler = canViewMatches 
+      ? `onclick="window.location.href = window.getPath('/tornei/partite/?tournament=${encodeURIComponent(tournamentId)}&node=${encodeURIComponent(node.id)}')"` 
+      : '';
+    const cursorClass = canViewMatches ? 'cursor-pointer hover:border-primary hover:shadow-md' : '';
     
     const statusConfig = {
       'pending': 'bg-muted text-muted-foreground',
@@ -103,19 +111,21 @@ class KnockoutBracket extends HTMLElement {
     const statusClass = statusConfig[node.status] || statusConfig['pending'];
     
     return `
-      <div class="bg-muted/30 rounded-lg p-3 border-2 border-border relative">
+      <div class="bg-muted/30 rounded-lg p-3 border-2 border-border relative ${cursorClass} transition-all"
+           ${clickHandler}>
         <div class="text-xs font-semibold ${statusClass} px-2 py-1 rounded mb-2 inline-block">
           ${node.name}
         </div>
         <div class="space-y-2">
-          <div class="bg-card p-2 rounded text-sm font-semibold ${players[0] ? 'text-foreground' : 'text-muted-foreground'}">
-            ${player1}
+          <div class="bg-card p-2 rounded text-sm font-semibold ${player1 ? 'text-foreground' : 'text-muted-foreground'}">
+            ${player1 || 'In attesa...'}
           </div>
           <div class="text-center text-muted-foreground text-xs">vs</div>
-          <div class="bg-card p-2 rounded text-sm font-semibold ${players[1] ? 'text-foreground' : 'text-muted-foreground'}">
-            ${player2}
+          <div class="bg-card p-2 rounded text-sm font-semibold ${player2 ? 'text-foreground' : 'text-muted-foreground'}">
+            ${player2 || 'In attesa...'}
           </div>
         </div>
+        ${canViewMatches ? '<div class="text-center mt-2 text-xs text-primary font-semibold">Clicca per vedere partite</div>' : ''}
       </div>
     `;
   }

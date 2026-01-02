@@ -248,8 +248,8 @@ class NuovoTorneoView extends HTMLElement {
           ranking_strategy: 'points'
         },
         semifinal: {
-          games_per_pair: 2,
-          ranking_strategy: 'aggregate'
+          games_per_pair: 1,
+          ranking_strategy: 'winner'
         },
         final: {
           games_per_pair: 1,
@@ -312,14 +312,22 @@ class NuovoTorneoView extends HTMLElement {
     
     // Create group nodes
     const groupLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    
+    // Determine knockout structure
+    // We always create 2 semifinals regardless of group count
+    // Top player from each group goes to semifinal 1 or 2 in alternating pattern
+    // Second place goes to opposite semifinal
+    
     for (let i = 0; i < groups.length; i++) {
-      // Top 2 from each group advance to knockout
+      // Map to only 2 semifinals
+      // Group A winner -> SF1, Group A runner-up -> SF2
+      // Group B winner -> SF2, Group B runner-up -> SF1
       const nextNodeMap = {
-        '1': `semifinal_${i * 2 + 1}`,
-        '2': `semifinal_${i * 2 + 2}`
+        '1': i % 2 === 0 ? 'semifinal_1' : 'semifinal_2',  // Winners alternate
+        '2': i % 2 === 0 ? 'semifinal_2' : 'semifinal_1'   // Runners-up go opposite
       };
       
-      console.log(`Creating group ${groupLetters[i]} with players:`, groups[i]);
+      console.log(`Creating group ${groupLetters[i]} with players:`, groups[i], 'mapping:', nextNodeMap);
       
       await createTournamentNode(
         tournamentId,

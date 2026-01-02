@@ -8,15 +8,34 @@
  */
 
 import { fetchPlayersFromSupabase, insertMatchToSupabase } from '../../backend/supabase.js';
+import { checkNodeCompletion, updateNodeStatus, advancePlayers, checkTournamentCompletion } from '../../backend/tournaments.js';
 
 class AddMatchView extends HTMLElement {
   constructor() {
     super();
     this.players = [];
     this.isSubmitting = false;
+    this.tournamentId = null;
+    this.nodeId = null;
+    this.preselectedPlayer1 = null;
+    this.preselectedPlayer2 = null;
   }
 
   async connectedCallback() {
+    // Read URL parameters for tournament context
+    const urlParams = new URLSearchParams(window.location.search);
+    this.tournamentId = urlParams.get('tournament');
+    this.nodeId = urlParams.get('node');
+    this.preselectedPlayer1 = urlParams.get('p1');
+    this.preselectedPlayer2 = urlParams.get('p2');
+    
+    console.log('Tournament context:', {
+      tournamentId: this.tournamentId,
+      nodeId: this.nodeId,
+      player1: this.preselectedPlayer1,
+      player2: this.preselectedPlayer2
+    });
+    
     // Show loading state
     this.innerHTML = `
       <div class="bg-card rounded-2xl shadow-lg overflow-hidden p-6">
@@ -44,6 +63,10 @@ class AddMatchView extends HTMLElement {
   }
   
   render() {
+    const isTournament = this.preselectedPlayer1 && this.preselectedPlayer2;
+    const player1Value = this.preselectedPlayer1 || '';
+    const player2Value = this.preselectedPlayer2 || '';
+    
     const playersOptions = this.players.map(player => 
       `<option value="${player}">${player}</option>`
     ).join('');
@@ -52,34 +75,54 @@ class AddMatchView extends HTMLElement {
       <div class="max-w-2xl mx-auto">        
         <div class="bg-card rounded-2xl shadow-lg overflow-hidden">
           <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
-            Aggiungi Nuova Partita
+            ${isTournament ? 'Aggiungi Partita Torneo' : 'Aggiungi Nuova Partita'}
           </div>
           
           <form id="add-match-form" class="p-6 space-y-6">
+            ${isTournament ? `
+              <!-- Hidden inputs for tournament preselected players -->
+              <input type="hidden" name="player1" value="${player1Value}">
+              <input type="hidden" name="player2" value="${player2Value}">
+            ` : ''}
+            
             <!-- Player Selection -->
             <div class="grid grid-cols-[1fr_auto_1fr] gap-0.5">
               <div class="flex flex-col gap-2">
-                <select 
-                  id="player1" 
-                  name="player1" 
-                  required
-                  class="w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground cursor-pointer focus:outline-none focus:border-primary transition-colors text-center">
-                  <option value="">Seleziona...</option>
-                  ${playersOptions}
-                </select>
+                ${isTournament ? `
+                  <!-- Display only for tournament -->
+                  <div class="w-full p-3 border-2 border-border rounded-lg font-semibold bg-muted text-foreground text-center opacity-70">
+                    ${player1Value}
+                  </div>
+                ` : `
+                  <select 
+                    id="player1" 
+                    name="player1" 
+                    required
+                    class="w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground cursor-pointer focus:outline-none focus:border-primary transition-colors text-center">
+                    <option value="">Seleziona...</option>
+                    ${playersOptions}
+                  </select>
+                `}
               </div>
               <div class="flex items-end py-2">
                 <div class="text-xl font-bold text-primary text-center px-2">VS</div>
               </div>
               <div class="flex flex-col gap-2">
-                <select 
-                  id="player2" 
-                  name="player2" 
-                  required
-                  class="w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground cursor-pointer focus:outline-none focus:border-primary transition-colors text-center">
-                  <option value="">Seleziona...</option>
-                  ${playersOptions}
-                </select>
+                ${isTournament ? `
+                  <!-- Display only for tournament -->
+                  <div class="w-full p-3 border-2 border-border rounded-lg font-semibold bg-muted text-foreground text-center opacity-70">
+                    ${player2Value}
+                  </div>
+                ` : `
+                  <select 
+                    id="player2" 
+                    name="player2" 
+                    required
+                    class="w-full p-3 border-2 border-border rounded-lg font-semibold bg-card text-card-foreground cursor-pointer focus:outline-none focus:border-primary transition-colors text-center">
+                    <option value="">Seleziona...</option>
+                    ${playersOptions}
+                  </select>
+                `}
               </div>
             </div>
             
@@ -190,6 +233,23 @@ class AddMatchView extends HTMLElement {
       form.addEventListener('submit', (e) => this.handleSubmit(e));
     }
     
+    // Set preselected players if in tournament context (only for non-tournament mode)
+    if (!this.preselectedPlayer1 || !this.preselectedPlayer2) {
+      if (this.preselectedPlayer1) {
+        const player1Select = this.querySelector('#player1');
+        if (player1Select) {
+          player1Select.value = this.preselectedPlayer1;
+        }
+      }
+      
+      if (this.preselectedPlayer2) {
+        const player2Select = this.querySelector('#player2');
+        if (player2Select) {
+          player2Select.value = this.preselectedPlayer2;
+        }
+      }
+    }
+    
     // Score plus buttons
     const score1Input = this.querySelector('#score1');
     const score1Plus = this.querySelector('#score1-plus');
@@ -287,17 +347,26 @@ class AddMatchView extends HTMLElement {
     submitBtn.textContent = 'Salvataggio in corso...';
     
     try {
-      // Insert match to Supabase
+      // Insert match to Supabase with tournament node if applicable
       await insertMatchToSupabase({
         player1,
         player2,
         score1,
         score2,
         matchType
-      });
+      }, this.nodeId);
       
-      // Success! Redirect to matches page
-      window.location.href = window.getPath('/matches/');
+      // If tournament context, check node completion and advance players
+      if (this.nodeId) {
+        await this.handleNodeCompletion();
+      }
+      
+      // Redirect based on context
+      if (this.tournamentId && this.nodeId) {
+        window.location.href = window.getPath(`/tornei/partite/?tournament=${this.tournamentId}&node=${this.nodeId}`);
+      } else {
+        window.location.href = window.getPath('/matches/');
+      }
       
     } catch (error) {
       console.error('Error inserting match:', error);
@@ -307,6 +376,28 @@ class AddMatchView extends HTMLElement {
       this.isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.textContent = 'Aggiungi Partita';
+    }
+  }
+  
+  async handleNodeCompletion() {
+    try {
+      console.log('Checking node completion...');
+      const { complete, rankings } = await checkNodeCompletion(this.tournamentId, this.nodeId);
+      
+      if (complete) {
+        console.log('Node complete! Advancing players...');
+        // Mark node as completed
+        await updateNodeStatus(this.nodeId, 'completed');
+        
+        // Advance players to next nodes
+        await advancePlayers(this.nodeId, rankings);
+        
+        // Check if tournament is complete
+        await checkTournamentCompletion(this.tournamentId);
+      }
+    } catch (error) {
+      console.error('Error handling node completion:', error);
+      // Don't throw - we still want to redirect even if this fails
     }
   }
   

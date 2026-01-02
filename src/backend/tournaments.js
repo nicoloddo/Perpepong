@@ -340,3 +340,255 @@ export function distributePlayersRandom(players, groupCount) {
     
     return groups;
 }
+
+/**
+ * Fetches all matches for a specific tournament node
+ * @param {string} nodeId - Node UUID
+ * @returns {Promise<Array>} Array of match objects
+ */
+export async function fetchNodeMatches(nodeId) {
+    try {
+        const { data, error } = await supabase
+            .from('partite')
+            .select('*')
+            .eq('tournament_node', nodeId)
+            .order('match_timestamp', { ascending: true });
+        
+        if (error) {
+            console.error('Supabase node matches fetch error:', error);
+            throw error;
+        }
+        
+        console.log('Node matches loaded:', data?.length || 0);
+        return data || [];
+    } catch (error) {
+        console.error('Error fetching node matches:', error);
+        throw error;
+    }
+}
+
+/**
+ * Fetches a single node by ID
+ * @param {string} nodeId - Node UUID
+ * @returns {Promise<Object>} Node object
+ */
+export async function fetchNodeById(nodeId) {
+    try {
+        const { data, error } = await supabase
+            .from('nodi_torneo')
+            .select('*')
+            .eq('id', nodeId)
+            .single();
+        
+        if (error) {
+            console.error('Supabase node fetch error:', error);
+            throw error;
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Error fetching node by ID:', error);
+        throw error;
+    }
+}
+
+/**
+ * Fetches a node by tournament ID and slug
+ * @param {string} tournamentId - Tournament UUID
+ * @param {string} slug - Node slug
+ * @returns {Promise<Object|null>} Node object or null if not found
+ */
+export async function fetchNodeBySlug(tournamentId, slug) {
+    try {
+        const { data, error } = await supabase
+            .from('nodi_torneo')
+            .select('*')
+            .eq('tournament', tournamentId)
+            .eq('slug', slug)
+            .single();
+        
+        if (error) {
+            if (error.code === 'PGRST116') {
+                // Not found
+                return null;
+            }
+            console.error('Supabase node by slug fetch error:', error);
+            throw error;
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Error fetching node by slug:', error);
+        throw error;
+    }
+}
+
+/**
+ * Calculates player rankings within a node
+ * @param {Object} node - Node object
+ * @param {Array} matches - Match objects
+ * @param {Object} settings - Node settings
+ * @returns {Array} Ranked players [{username, points, wins, losses, rank}]
+ */
+function calculateNodeRankings(node, matches, settings) {
+    // Initialize player stats
+    const stats = {};
+    node.players.forEach(p => {
+        stats[p] = { username: p, points: 0, wins: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 };
+    });
+    
+    // Process matches
+    matches.forEach(match => {
+        const winner = match.score1 > match.score2 ? match.player1 : match.player2;
+        const loser = match.score1 > match.score2 ? match.player2 : match.player1;
+        const winnerScore = Math.max(match.score1, match.score2);
+        const loserScore = Math.min(match.score1, match.score2);
+        
+        if (stats[winner]) {
+            stats[winner].wins++;
+            stats[winner].points += settings.win_pts || 3;
+            stats[winner].goalsFor += winnerScore;
+            stats[winner].goalsAgainst += loserScore;
+        }
+        
+        if (stats[loser]) {
+            stats[loser].losses++;
+            stats[loser].goalsFor += loserScore;
+            stats[loser].goalsAgainst += winnerScore;
+        }
+    });
+    
+    // Sort by points, then goal difference
+    const ranked = Object.values(stats).sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        const goalDiffA = a.goalsFor - a.goalsAgainst;
+        const goalDiffB = b.goalsFor - b.goalsAgainst;
+        return goalDiffB - goalDiffA;
+    });
+    
+    // Add rank numbers
+    ranked.forEach((player, index) => {
+        player.rank = index + 1;
+    });
+    
+    return ranked;
+}
+
+/**
+ * Checks if all required matches for a node are complete
+ * @param {string} tournamentId - Tournament UUID
+ * @param {string} nodeId - Node UUID
+ * @returns {Promise<Object>} { complete: boolean, rankings: Array }
+ */
+export async function checkNodeCompletion(tournamentId, nodeId) {
+    try {
+        // Fetch tournament to get settings for this node type
+        const tournament = await fetchTournamentById(tournamentId);
+        const node = await fetchNodeById(nodeId);
+        
+        // Get type-specific settings
+        const nodeSettings = tournament.settings[node.type] || {};
+        const gamesPerPair = nodeSettings.games_per_pair || 1;
+        
+        // Fetch all matches for this node
+        const matches = await fetchNodeMatches(nodeId);
+        
+        // Calculate required matches: players × (players-1) / 2 × gamesPerPair
+        const playerCount = node.players.length;
+        const requiredMatches = (playerCount * (playerCount - 1) / 2) * gamesPerPair;
+        
+        console.log('Node completion check:', {
+            nodeId,
+            playerCount,
+            gamesPerPair,
+            requiredMatches,
+            currentMatches: matches.length
+        });
+        
+        // Check if all matches are played
+        const complete = matches.length >= requiredMatches;
+        
+        // Calculate rankings if complete
+        let rankings = [];
+        if (complete) {
+            rankings = calculateNodeRankings(node, matches, nodeSettings);
+            console.log('Node rankings:', rankings);
+        }
+        
+        return { complete, rankings };
+    } catch (error) {
+        console.error('Error checking node completion:', error);
+        throw error;
+    }
+}
+
+/**
+ * Advances players to next nodes based on rankings and next_node_map
+ * @param {string} nodeId - Completed node UUID
+ * @param {Array} rankings - Player rankings
+ * @returns {Promise<void>}
+ */
+export async function advancePlayers(nodeId, rankings) {
+    try {
+        const node = await fetchNodeById(nodeId);
+        const nextNodeMap = node.next_node_map || {};
+        
+        console.log('Advancing players:', { nodeId, nextNodeMap, rankings });
+        
+        // For each rank in the map, advance players
+        for (const [rank, targetSlug] of Object.entries(nextNodeMap)) {
+            const player = rankings.find(r => r.rank === parseInt(rank));
+            if (!player) {
+                console.log(`No player found for rank ${rank}`);
+                continue;
+            }
+            
+            // Find target node by slug
+            const targetNode = await fetchNodeBySlug(node.tournament, targetSlug);
+            if (!targetNode) {
+                console.log(`Target node not found: ${targetSlug}`);
+                continue;
+            }
+            
+            // Add player to target node if not already there
+            const currentPlayers = targetNode.players || [];
+            if (!currentPlayers.includes(player.username)) {
+                const updatedPlayers = [...currentPlayers, player.username];
+                await updateNodePlayers(targetNode.id, updatedPlayers);
+                console.log(`Advanced ${player.username} to ${targetSlug}`);
+            }
+        }
+    } catch (error) {
+        console.error('Error advancing players:', error);
+        throw error;
+    }
+}
+
+/**
+ * Checks if all tournament nodes are complete and updates tournament status
+ * @param {string} tournamentId - Tournament UUID
+ * @returns {Promise<void>}
+ */
+export async function checkTournamentCompletion(tournamentId) {
+    try {
+        const nodes = await fetchTournamentNodes(tournamentId);
+        
+        // Check if all nodes are completed
+        const allComplete = nodes.every(node => node.status === 'completed');
+        
+        console.log('Tournament completion check:', {
+            tournamentId,
+            totalNodes: nodes.length,
+            completedNodes: nodes.filter(n => n.status === 'completed').length,
+            allComplete
+        });
+        
+        if (allComplete) {
+            await updateTournamentStatus(tournamentId, 'completed');
+            console.log('Tournament marked as completed');
+        }
+    } catch (error) {
+        console.error('Error checking tournament completion:', error);
+        throw error;
+    }
+}

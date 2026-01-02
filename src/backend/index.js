@@ -34,7 +34,13 @@ export {
     distributePlayersRandom,
     updateTournamentStatus,
     updateNodePlayers,
-    updateNodeStatus
+    updateNodeStatus,
+    fetchNodeMatches,
+    fetchNodeById,
+    fetchNodeBySlug,
+    checkNodeCompletion,
+    advancePlayers,
+    checkTournamentCompletion
 } from './tournaments.js';
 
 // Make all functions available globally for backward compatibility
@@ -60,7 +66,13 @@ import {
     distributePlayersRandom,
     updateTournamentStatus,
     updateNodePlayers,
-    updateNodeStatus
+    updateNodeStatus,
+    fetchNodeMatches,
+    fetchNodeById,
+    fetchNodeBySlug,
+    checkNodeCompletion,
+    advancePlayers,
+    checkTournamentCompletion
 } from './tournaments.js';
 
 if (typeof window !== 'undefined') {
@@ -88,4 +100,10 @@ if (typeof window !== 'undefined') {
     window.updateTournamentStatus = updateTournamentStatus;
     window.updateNodePlayers = updateNodePlayers;
     window.updateNodeStatus = updateNodeStatus;
+    window.fetchNodeMatches = fetchNodeMatches;
+    window.fetchNodeById = fetchNodeById;
+    window.fetchNodeBySlug = fetchNodeBySlug;
+    window.checkNodeCompletion = checkNodeCompletion;
+    window.advancePlayers = advancePlayers;
+    window.checkTournamentCompletion = checkTournamentCompletion;
 }

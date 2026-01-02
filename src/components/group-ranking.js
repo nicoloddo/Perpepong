@@ -37,9 +37,11 @@ class GroupRanking extends HTMLElement {
       <div class="bg-card rounded-xl shadow-lg overflow-hidden mb-4">
         <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-4 flex justify-between items-center">
           <h3 class="text-lg font-bold">${groupName}</h3>
-          <div class="text-xs text-primary-foreground/70">
-            Partite non ancora implementate
-          </div>
+          <button 
+            class="bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground font-semibold py-2 px-4 rounded-lg transition-all text-sm"
+            onclick="window.location.href = window.getPath('/tornei/partite/?tournament=${encodeURIComponent(tournamentId)}&node=${encodeURIComponent(nodeId)}')">
+            Vai alle Partite
+          </button>
         </div>
         
         <div class="p-4">

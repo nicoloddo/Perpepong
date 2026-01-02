@@ -8,7 +8,7 @@
  * <torneo-dettaglio-view></torneo-dettaglio-view>
  */
 
-import { fetchTournamentById, fetchTournamentNodes } from '../../backend/tournaments.js';
+import { fetchTournamentById, fetchTournamentNodes, fetchNodeMatches } from '../../backend/tournaments.js';
 
 class TorneoDettaglioView extends HTMLElement {
   constructor() {
@@ -62,9 +62,14 @@ class TorneoDettaglioView extends HTMLElement {
     this.render();
   }
   
-  render() {
+  async render() {
     const hasGroups = this.nodes.some(n => n.type === 'group');
     const hasKnockout = this.nodes.some(n => ['semifinal', 'final', 'quarterfinal'].includes(n.type));
+    
+    // Get tab content
+    const tabContent = this.activeTab === 'gironi' 
+      ? await this.renderGironiTab() 
+      : this.renderKnockoutTab();
     
     this.innerHTML = `
       <!-- Tournament Header -->
@@ -118,12 +123,12 @@ class TorneoDettaglioView extends HTMLElement {
       
       <!-- Tab Content -->
       <div class="tab-content">
-        ${this.activeTab === 'gironi' ? this.renderGironiTab() : this.renderKnockoutTab()}
+        ${tabContent}
       </div>
     `;
   }
   
-  renderGironiTab() {
+  async renderGironiTab() {
     const groupNodes = this.nodes.filter(n => n.type === 'group');
     
     if (groupNodes.length === 0) {
@@ -137,29 +142,69 @@ class TorneoDettaglioView extends HTMLElement {
     // Sort groups by type_var (A, B, C, etc.)
     groupNodes.sort((a, b) => a.type_var.localeCompare(b.type_var));
     
+    // Fetch matches and calculate real standings for each group
+    const groupStandingsPromises = groupNodes.map(async (node) => {
+      const matches = await fetchNodeMatches(node.id);
+      const standings = this.calculateGroupStandings(node, matches);
+      return { node, standings };
+    });
+    
+    const groupsWithStandings = await Promise.all(groupStandingsPromises);
+    
     return `
       <div class="space-y-4">
-        ${groupNodes.map(node => {
-          // For now, create mock standings since matches aren't implemented yet
-          const players = node.players || [];
-          const standings = players.map((username, index) => ({
-            username,
-            points: 0,
-            wins: 0,
-            losses: 0
-          }));
-          
-          return `
-            <group-ranking
-              group-name="${node.name}"
-              players='${JSON.stringify(standings)}'
-              tournament-id="${this.tournament.id}"
-              node-id="${node.id}">
-            </group-ranking>
-          `;
-        }).join('')}
+        ${groupsWithStandings.map(({ node, standings }) => `
+          <group-ranking
+            group-name="${node.name}"
+            players='${JSON.stringify(standings)}'
+            tournament-id="${this.tournament.id}"
+            node-id="${node.id}">
+          </group-ranking>
+        `).join('')}
       </div>
     `;
+  }
+  
+  calculateGroupStandings(node, matches) {
+    const nodeSettings = this.tournament.settings[node.type] || {};
+    const winPoints = nodeSettings.win_pts || 3;
+    
+    // Initialize player stats
+    const stats = {};
+    node.players.forEach(p => {
+      stats[p] = { username: p, points: 0, wins: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 };
+    });
+    
+    // Process matches
+    matches.forEach(match => {
+      const winner = match.score1 > match.score2 ? match.player1 : match.player2;
+      const loser = match.score1 > match.score2 ? match.player2 : match.player1;
+      const winnerScore = Math.max(match.score1, match.score2);
+      const loserScore = Math.min(match.score1, match.score2);
+      
+      if (stats[winner]) {
+        stats[winner].wins++;
+        stats[winner].points += winPoints;
+        stats[winner].goalsFor += winnerScore;
+        stats[winner].goalsAgainst += loserScore;
+      }
+      
+      if (stats[loser]) {
+        stats[loser].losses++;
+        stats[loser].goalsFor += loserScore;
+        stats[loser].goalsAgainst += winnerScore;
+      }
+    });
+    
+    // Sort by points, then goal difference
+    const ranked = Object.values(stats).sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      const goalDiffA = a.goalsFor - a.goalsAgainst;
+      const goalDiffB = b.goalsFor - b.goalsAgainst;
+      return goalDiffB - goalDiffA;
+    });
+    
+    return ranked;
   }
   
   renderKnockoutTab() {
