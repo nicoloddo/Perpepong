@@ -29,7 +29,7 @@ class DateGroupHeader extends HTMLElement {
     
     this.innerHTML = `
       <div class="bg-gradient-to-r from-primary/20 to-primary/10 px-4 py-3 mb-2 mt-4 first:mt-0 rounded-lg">
-        <div class="text-sm font-bold text-white uppercase tracking-wide">
+        <div class="text-sm font-bold text-black uppercase tracking-wide">
           ${capitalizedDate}
         </div>
       </div>
