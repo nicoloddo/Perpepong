@@ -20,4 +20,7 @@ import './players-ranking.js';
 import './virtual-match-viewer.js';
 import './user-profile-button.js';
 import './date-group-header.js';
+import './tournament-card.js';
+import './group-ranking.js';
+import './knockout-bracket.js';
 
