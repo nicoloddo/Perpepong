@@ -145,7 +145,7 @@ class TorneoDettaglioView extends HTMLElement {
     // Fetch matches and calculate real standings for each group
     const groupStandingsPromises = groupNodes.map(async (node) => {
       const matches = await fetchNodeMatches(node.id);
-      const standings = this.calculateGroupStandings(node, matches);
+      const standings = await this.calculateGroupStandings(node, matches);
       return { node, standings };
     });
     
@@ -165,14 +165,25 @@ class TorneoDettaglioView extends HTMLElement {
     `;
   }
   
-  calculateGroupStandings(node, matches) {
+  async calculateGroupStandings(node, matches) {
     const nodeSettings = this.tournament.settings[node.type] || {};
     const winPoints = nodeSettings.win_pts || 3;
+    
+    // Fetch player ELOs
+    const playerElos = await this.fetchPlayerElos(this.tournament.participants);
     
     // Initialize player stats
     const stats = {};
     node.players.forEach(p => {
-      stats[p] = { username: p, points: 0, wins: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 };
+      stats[p] = { 
+        username: p, 
+        points: 0, 
+        wins: 0, 
+        losses: 0, 
+        goalsFor: 0, 
+        goalsAgainst: 0,
+        elo: playerElos[p] || 1500
+      };
     });
     
     // Process matches
@@ -196,15 +207,61 @@ class TorneoDettaglioView extends HTMLElement {
       }
     });
     
-    // Sort by points, then goal difference
+    // Sort by multiple criteria:
+    // 1. Points (descending)
+    // 2. Goal difference (descending)
+    // 3. ELO (ascending - lower ELO first to favor underdogs)
+    // 4. Random (using username hash for deterministic "random")
     const ranked = Object.values(stats).sort((a, b) => {
+      // 1. Points
       if (b.points !== a.points) return b.points - a.points;
+      
+      // 2. Goal difference
       const goalDiffA = a.goalsFor - a.goalsAgainst;
       const goalDiffB = b.goalsFor - b.goalsAgainst;
-      return goalDiffB - goalDiffA;
+      if (goalDiffB !== goalDiffA) return goalDiffB - goalDiffA;
+      
+      // 3. ELO (lower ELO ranks higher - favor underdogs)
+      if (a.elo !== b.elo) return a.elo - b.elo;
+      
+      // 4. Deterministic "random" based on username hash
+      const hashA = a.username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const hashB = b.username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      return hashA - hashB;
     });
     
     return ranked;
+  }
+  
+  async fetchPlayerElos(playerUsernames) {
+    try {
+      // Use window functions that are globally available
+      const partite = await window.caricaPartite();
+      const classifica = window.calcolaClassifica(partite);
+      
+      // Create a map of username to ELO
+      const eloMap = {};
+      classifica.forEach(player => {
+        eloMap[player.nome] = player.elo;
+      });
+      
+      // Fill in any missing players with default ELO
+      playerUsernames.forEach(username => {
+        if (!eloMap[username]) {
+          eloMap[username] = 1500;
+        }
+      });
+      
+      return eloMap;
+    } catch (error) {
+      console.error('Error fetching player ELOs:', error);
+      // Return default ELOs on error
+      const defaultMap = {};
+      playerUsernames.forEach(username => {
+        defaultMap[username] = 1500;
+      });
+      return defaultMap;
+    }
   }
   
   renderKnockoutTab() {

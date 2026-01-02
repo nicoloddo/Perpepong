@@ -428,13 +428,22 @@ export async function fetchNodeBySlug(tournamentId, slug) {
  * @param {Object} node - Node object
  * @param {Array} matches - Match objects
  * @param {Object} settings - Node settings
+ * @param {Object} playerElos - Optional map of username to ELO rating
  * @returns {Array} Ranked players [{username, points, wins, losses, rank}]
  */
-function calculateNodeRankings(node, matches, settings) {
+function calculateNodeRankings(node, matches, settings, playerElos = {}) {
     // Initialize player stats
     const stats = {};
     node.players.forEach(p => {
-        stats[p] = { username: p, points: 0, wins: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 };
+        stats[p] = { 
+            username: p, 
+            points: 0, 
+            wins: 0, 
+            losses: 0, 
+            goalsFor: 0, 
+            goalsAgainst: 0,
+            elo: playerElos[p] || 1500
+        };
     });
     
     // Process matches
@@ -458,12 +467,27 @@ function calculateNodeRankings(node, matches, settings) {
         }
     });
     
-    // Sort by points, then goal difference
+    // Sort by multiple criteria:
+    // 1. Points (descending)
+    // 2. Goal difference (descending)
+    // 3. ELO (ascending - lower ELO first to favor underdogs)
+    // 4. Random (using username hash for deterministic "random")
     const ranked = Object.values(stats).sort((a, b) => {
+        // 1. Points
         if (b.points !== a.points) return b.points - a.points;
+        
+        // 2. Goal difference
         const goalDiffA = a.goalsFor - a.goalsAgainst;
         const goalDiffB = b.goalsFor - b.goalsAgainst;
-        return goalDiffB - goalDiffA;
+        if (goalDiffB !== goalDiffA) return goalDiffB - goalDiffA;
+        
+        // 3. ELO (lower ELO ranks higher - favor underdogs)
+        if (a.elo !== b.elo) return a.elo - b.elo;
+        
+        // 4. Deterministic "random" based on username hash
+        const hashA = a.username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const hashB = b.username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        return hashA - hashB;
     });
     
     // Add rank numbers
@@ -511,7 +535,9 @@ export async function checkNodeCompletion(tournamentId, nodeId) {
         // Calculate rankings if complete
         let rankings = [];
         if (complete) {
-            rankings = calculateNodeRankings(node, matches, nodeSettings);
+            // Fetch player ELOs from tournament participants if available
+            const playerElos = await fetchPlayerElos(tournament.participants);
+            rankings = calculateNodeRankings(node, matches, nodeSettings, playerElos);
             console.log('Node rankings:', rankings);
         }
         
@@ -519,6 +545,48 @@ export async function checkNodeCompletion(tournamentId, nodeId) {
     } catch (error) {
         console.error('Error checking node completion:', error);
         throw error;
+    }
+}
+
+/**
+ * Fetches current ELO ratings for a list of players
+ * @param {Array<string>} playerUsernames - Array of player usernames
+ * @returns {Promise<Object>} Map of username to ELO rating
+ */
+async function fetchPlayerElos(playerUsernames) {
+    try {
+        // Import the necessary functions from matches-loader
+        const { fetchMatchesFromSupabase } = await import('./supabase.js');
+        const { calcolaClassifica } = await import('./rankings.js');
+        const { transformSupabaseMatchesToEloFormat } = await import('./supabase.js');
+        
+        // Fetch all matches and calculate current ELO standings
+        const supabaseMatches = await fetchMatchesFromSupabase();
+        const matches = transformSupabaseMatchesToEloFormat(supabaseMatches);
+        const classifica = calcolaClassifica(matches);
+        
+        // Create a map of username to ELO
+        const eloMap = {};
+        classifica.forEach(player => {
+            eloMap[player.nome] = player.elo;
+        });
+        
+        // Fill in any missing players with default ELO
+        playerUsernames.forEach(username => {
+            if (!eloMap[username]) {
+                eloMap[username] = 1500;
+            }
+        });
+        
+        return eloMap;
+    } catch (error) {
+        console.error('Error fetching player ELOs:', error);
+        // Return default ELOs on error
+        const defaultMap = {};
+        playerUsernames.forEach(username => {
+            defaultMap[username] = 1500;
+        });
+        return defaultMap;
     }
 }
 
