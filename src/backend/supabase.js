@@ -166,9 +166,10 @@ export function transformSupabaseMatchesToEloFormat(supabaseMatches) {
  * @param {number} matchData.score1 - First player score
  * @param {number} matchData.score2 - Second player score
  * @param {string} matchData.matchType - Match type (single-21 or single-11)
+ * @param {string} tournamentNodeId - Optional tournament node UUID
  * @returns {Promise<Object>} Inserted match data
  */
-export async function insertMatchToSupabase(matchData) {
+export async function insertMatchToSupabase(matchData, tournamentNodeId = null) {
     try {
         // Get current timestamp in Rome timezone
         const now = new Date();
@@ -189,18 +190,23 @@ export async function insertMatchToSupabase(matchData) {
         const timeStr = `${parts.find(p => p.type === 'hour').value}:${parts.find(p => p.type === 'minute').value}:${parts.find(p => p.type === 'second').value}`;
         const timestampStr = `${dateStr} ${timeStr}+01:00`; // Rome timezone offset
         
+        const insertData = {
+            player1: matchData.player1,
+            player2: matchData.player2,
+            score1: matchData.score1,
+            score2: matchData.score2,
+            match_type: matchData.matchType,
+            match_timestamp: timestampStr
+        };
+        
+        // Add tournament_node if provided
+        if (tournamentNodeId) {
+            insertData.tournament_node = tournamentNodeId;
+        }
+        
         const { data, error } = await supabase
             .from('partite')
-            .insert([
-                {
-                    player1: matchData.player1,
-                    player2: matchData.player2,
-                    score1: matchData.score1,
-                    score2: matchData.score2,
-                    match_type: matchData.matchType,
-                    match_timestamp: timestampStr
-                }
-            ])
+            .insert([insertData])
             .select();
         
         if (error) {

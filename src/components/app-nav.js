@@ -15,6 +15,7 @@ class AppNav extends HTMLElement {
     const navItems = [
       { id: 'home', label: 'Classifica', href: window.getPath('/') },
       { id: 'matches', label: 'Partite', href: window.getPath('/matches/') },
+      { id: 'tornei', label: 'Tornei', href: window.getPath('/tornei/') },
       { id: 'quote', label: 'Quote', href: window.getPath('/quote/') },
       { id: 'virtualini', label: 'Virtualini', href: window.getPath('/virtualini/') }
     ];

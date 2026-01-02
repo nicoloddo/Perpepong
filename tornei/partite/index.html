@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+    <title>Partite Nodo - Perpeponghieri</title>
+    <link rel="stylesheet" href="../../src/shared/output.css">
+</head>
+<body class="min-h-screen p-3 pb-24">
+    <div class="container mx-auto max-w-full">
+        <app-header></app-header>
+
+        <partite-nodo-view></partite-nodo-view>
+    </div>
+
+    <app-nav active="tornei"></app-nav>
+
+    <script src="../../src/shared/base-path.js"></script>
+    <script type="module" src="../../src/backend/index.js"></script>
+    <script type="module" src="../../src/components/register.js"></script>
+    <script type="module" src="../../src/pages/tornei/partite-nodo-view.js"></script>
+</body>
+</html>
