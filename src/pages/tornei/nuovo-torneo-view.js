@@ -29,7 +29,12 @@ class NuovoTorneoView extends HTMLElement {
     this.tournamentSettings = {
       name: '',
       hasGroupStage: true,
-      distributionStrategy: 'balanced'
+      distributionStrategy: 'balanced',
+      gamesPerNode: {
+        group: 1,
+        semifinal: 1,
+        final: 1
+      }
     };
   }
 
@@ -70,7 +75,7 @@ class NuovoTorneoView extends HTMLElement {
     this.innerHTML = `
       <div class="bg-card rounded-xl shadow-lg overflow-hidden mb-5">
         <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5">
-          <h2 class="text-xl font-bold">Nuovo Torneo - Step 1/2</h2>
+          <h2 class="text-xl font-bold">Nuovo Torneo - Step 1/3</h2>
           <p class="text-sm opacity-90 mt-1">Seleziona i partecipanti</p>
         </div>
         
@@ -138,7 +143,7 @@ class NuovoTorneoView extends HTMLElement {
     this.innerHTML = `
       <div class="bg-card rounded-xl shadow-lg overflow-hidden mb-5">
         <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5">
-          <h2 class="text-xl font-bold">Nuovo Torneo - Step 2/2</h2>
+          <h2 class="text-xl font-bold">Nuovo Torneo - Step 2/3</h2>
           <p class="text-sm opacity-90 mt-1">Configura il torneo</p>
         </div>
         
@@ -193,7 +198,7 @@ class NuovoTorneoView extends HTMLElement {
               <button 
                 type="submit"
                 class="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold py-3 rounded-xl shadow-lg transition-all duration-200">
-                Crea Torneo
+                Avanti →
               </button>
             </div>
           </form>
@@ -206,9 +211,118 @@ class NuovoTorneoView extends HTMLElement {
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
+        this.saveStep2AndContinue();
+      });
+    }
+  }
+  
+  saveStep2AndContinue() {
+    // Save settings from step 2
+    this.tournamentSettings.name = document.getElementById('tournament-name')?.value || 'Torneo Senza Nome';
+    this.tournamentSettings.hasGroupStage = document.getElementById('has-group-stage')?.checked || false;
+    this.tournamentSettings.distributionStrategy = document.getElementById('distribution-strategy')?.value || 'balanced';
+    
+    console.log('Step 2 saved:', this.tournamentSettings);
+    
+    // Go to step 3
+    this.currentStep = 3;
+    this.renderStep3();
+  }
+  
+  renderStep3() {
+    const hasGroupStage = this.tournamentSettings.hasGroupStage;
+    
+    this.innerHTML = `
+      <div class="bg-card rounded-xl shadow-lg overflow-hidden mb-5">
+        <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5">
+          <h2 class="text-xl font-bold">Nuovo Torneo - Step 3/3</h2>
+          <p class="text-sm opacity-90 mt-1">Configura le partite per fase</p>
+        </div>
+        
+        <div class="p-5">
+          <form id="games-per-node-form" class="space-y-6">
+            ${hasGroupStage ? `
+              <!-- Group Stage Games -->
+              <div>
+                <label class="block text-sm font-semibold mb-2">Fase a Gironi - Partite per coppia</label>
+                <input 
+                  type="number" 
+                  id="games-group"
+                  min="1" 
+                  max="5"
+                  value="${this.tournamentSettings.gamesPerNode.group}"
+                  class="w-full p-3 bg-muted/30 rounded-lg border border-border focus:border-primary focus:outline-none"
+                  required>
+                <p class="text-xs text-muted-foreground mt-1">
+                  Quante partite devono giocare due giocatori dello stesso girone tra loro
+                </p>
+              </div>
+            ` : ''}
+            
+            <!-- Semifinal Games -->
+            <div>
+              <label class="block text-sm font-semibold mb-2">Semifinali - Partite per coppia</label>
+              <input 
+                type="number" 
+                id="games-semifinal"
+                min="1" 
+                max="5"
+                value="${this.tournamentSettings.gamesPerNode.semifinal}"
+                class="w-full p-3 bg-muted/30 rounded-lg border border-border focus:border-primary focus:outline-none"
+                required>
+              <p class="text-xs text-muted-foreground mt-1">
+                Quante partite devono giocare i due giocatori in una semifinale
+              </p>
+            </div>
+            
+            <!-- Final Games -->
+            <div>
+              <label class="block text-sm font-semibold mb-2">Finale - Partite per coppia</label>
+              <input 
+                type="number" 
+                id="games-final"
+                min="1" 
+                max="5"
+                value="${this.tournamentSettings.gamesPerNode.final}"
+                class="w-full p-3 bg-muted/30 rounded-lg border border-border focus:border-primary focus:outline-none"
+                required>
+              <p class="text-xs text-muted-foreground mt-1">
+                Quante partite devono giocare i due giocatori in finale
+              </p>
+            </div>
+            
+            <div class="flex gap-3">
+              <button 
+                type="button"
+                class="flex-1 bg-muted hover:bg-muted/70 text-foreground font-bold py-3 rounded-xl shadow-lg transition-all duration-200"
+                onclick="document.querySelector('nuovo-torneo-view').goBackToStep2()">
+                ← Indietro
+              </button>
+              
+              <button 
+                type="submit"
+                class="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold py-3 rounded-xl shadow-lg transition-all duration-200">
+                Crea Torneo
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    // Attach form submit handler
+    const form = this.querySelector('#games-per-node-form');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
         this.createTournament();
       });
     }
+  }
+  
+  goBackToStep2() {
+    this.currentStep = 2;
+    this.renderStep2();
   }
   
   goBackToStep1() {
@@ -218,12 +332,17 @@ class NuovoTorneoView extends HTMLElement {
   
   async createTournament() {
     try {
-      // Get form values BEFORE clearing the form
-      const name = document.getElementById('tournament-name')?.value || 'Torneo Senza Nome';
-      const hasGroupStage = document.getElementById('has-group-stage')?.checked || false;
-      const strategy = document.getElementById('distribution-strategy')?.value || 'balanced';
+      // Get games per node values from step 3 form
+      const gamesGroup = parseInt(document.getElementById('games-group')?.value) || 1;
+      const gamesSemifinal = parseInt(document.getElementById('games-semifinal')?.value) || 1;
+      const gamesFinal = parseInt(document.getElementById('games-final')?.value) || 1;
       
-      console.log('Creating tournament:', { name, hasGroupStage, strategy });
+      // Use saved settings from step 2
+      const name = this.tournamentSettings.name;
+      const hasGroupStage = this.tournamentSettings.hasGroupStage;
+      const strategy = this.tournamentSettings.distributionStrategy;
+      
+      console.log('Creating tournament:', { name, hasGroupStage, strategy, gamesGroup, gamesSemifinal, gamesFinal });
       
       // Show loading state
       this.innerHTML = `
@@ -244,16 +363,16 @@ class NuovoTorneoView extends HTMLElement {
         has_group_stage: hasGroupStage,
         distribution_strategy: strategy,
         group: {
-          games_per_pair: 1,
+          games_per_pair: gamesGroup,
           ranking_strategy: 'points'
         },
         semifinal: {
-          games_per_pair: 1,
-          ranking_strategy: 'winner'
+          games_per_pair: gamesSemifinal,
+          ranking_strategy: gamesSemifinal > 1 ? 'aggregate' : 'winner'
         },
         final: {
-          games_per_pair: 1,
-          ranking_strategy: 'winner'
+          games_per_pair: gamesFinal,
+          ranking_strategy: gamesFinal > 1 ? 'aggregate' : 'winner'
         }
       };
       
