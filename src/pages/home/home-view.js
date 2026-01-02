@@ -6,10 +6,26 @@
  * Usage:
  * <home-view></home-view>
  */
+
+import { getCurrentUser } from '../../backend/auth.js';
+
 class HomeView extends HTMLElement {
   constructor() {
     super();
     this.isExpanded = false;
+  }
+
+  async handleAddMatch() {
+    // Check if user is logged in
+    const { user } = await getCurrentUser();
+    
+    if (!user) {
+      // Not logged in - redirect to auth page
+      window.location.href = window.getPath('/auth/');
+    } else {
+      // Logged in - go to add match page
+      window.location.href = window.getPath('/add-match/');
+    }
   }
 
   async connectedCallback() {
@@ -174,6 +190,14 @@ class HomeView extends HTMLElement {
         <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
           Classifica Giocatori
         </div>
+        <div class="p-4">
+          <button 
+            id="add-match-btn-classifica"
+            class="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+            style="padding: 0.5rem 1.5rem;">
+            + Aggiungi Partita
+          </button>
+        </div>
         <players-ranking class="divide-y divide-border"></players-ranking>
       </div>
     `;
@@ -196,6 +220,12 @@ class HomeView extends HTMLElement {
           toggleText.textContent = '▼ Mostra tutte le statistiche';
         }
       });
+    }
+
+    // Add event listener for add match button
+    const addMatchBtn = this.querySelector('#add-match-btn-classifica');
+    if (addMatchBtn) {
+      addMatchBtn.addEventListener('click', () => this.handleAddMatch());
     }
   }
 }

@@ -44,6 +44,28 @@ class PlayerProfileView extends HTMLElement {
       this.innerHTML = `<div class="p-4 bg-destructive text-destructive-foreground rounded-xl text-center">Errore: ${error.message}</div>`;
     }
   }
+
+  /**
+   * Groups matches by date (without time)
+   * @param {Array} matches - Array of matches with timestamp
+   * @returns {Object} Object with dates as keys and arrays of matches as values
+   */
+  groupMatchesByDate(matches) {
+    const grouped = {};
+    
+    matches.forEach(match => {
+      // Get date without time
+      const date = new Date(match.timestamp);
+      const dateKey = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push(match);
+    });
+    
+    return grouped;
+  }
   
   render(playerData, rank, totalPlayers, matchHistory, matchupStats) {
     const winRate = ((playerData.vittorie / playerData.partiteGiocate) * 100).toFixed(1);
@@ -117,28 +139,8 @@ class PlayerProfileView extends HTMLElement {
         <div class="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-5 text-lg font-bold">
           🏓 Storico Partite
         </div>
-        <div class="divide-y divide-border">
-          ${[...matchHistory].reverse().map(match => {
-            const resultClass = match.won ? 'bg-primary/5' : 'bg-destructive/5';
-            const resultText = match.won ? 'W' : 'L';
-            const resultColor = match.won ? 'text-primary' : 'text-destructive';
-            const eloChangeClass = match.eloChange >= 0 ? 'text-green-500 bg-green-50' : 'text-red-500 bg-red-50';
-            const eloChangeText = match.eloChange >= 0 ? `+${Math.round(match.eloChange)}` : Math.round(match.eloChange);
-
-            return `
-              <div class="flex items-center p-4 cursor-pointer hover:bg-accent/50 transition-colors ${resultClass}" onclick="window.location.href=window.getPath('/match-detail/?match=${match.matchNumber - 1}')">
-                <div class="text-xl font-bold ${resultColor} min-w-[40px] text-center">${resultText}</div>
-                <div class="flex-1 ml-3">
-                  <div class="text-lg font-semibold">vs ${match.opponent}</div>
-                  <div class="text-muted-foreground text-sm">Partita #${match.matchNumber}</div>
-                </div>
-                <div class="text-right">
-                  <div class="text-2xl font-bold">${match.playerScore}-${match.opponentScore}</div>
-                  <div class="text-sm font-semibold px-2 py-1 rounded ${eloChangeClass}">${eloChangeText}</div>
-                </div>
-              </div>
-            `;
-          }).join('')}
+        <div class="p-4">
+          ${this.renderMatchHistory(matchHistory)}
         </div>
       </div>
     `;
@@ -182,6 +184,56 @@ class PlayerProfileView extends HTMLElement {
         </div>
       </div>
     `;
+  }
+
+  renderMatchHistory(matchHistory) {
+    // Reverse to get newest first
+    const reversedMatches = [...matchHistory].reverse();
+    
+    // Group by date
+    const groupedMatches = this.groupMatchesByDate(reversedMatches);
+    
+    // Sort dates in descending order (newest first)
+    const sortedDates = Object.keys(groupedMatches).sort((a, b) => new Date(b) - new Date(a));
+    
+    // Generate HTML for each date group
+    return sortedDates.map(dateKey => {
+      const dateMatches = groupedMatches[dateKey];
+      
+      // Sort matches within the day by timestamp (newest first)
+      dateMatches.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      const matchesHTML = dateMatches.map(match => {
+        const resultClass = match.won ? 'bg-primary/5' : 'bg-destructive/5';
+        const resultText = match.won ? 'W' : 'L';
+        const resultColor = match.won ? 'text-primary' : 'text-destructive';
+        const eloChangeClass = match.eloChange >= 0 ? 'text-green-500 bg-green-50' : 'text-red-500 bg-red-50';
+        const eloChangeText = match.eloChange >= 0 ? `+${Math.round(match.eloChange)}` : Math.round(match.eloChange);
+
+        return `
+          <div class="flex items-center p-4 cursor-pointer hover:bg-accent/50 transition-colors ${resultClass}" onclick="window.location.href=window.getPath('/match-detail/?match=${match.matchNumber - 1}')">
+            <div class="text-xl font-bold ${resultColor} min-w-[40px] text-center">${resultText}</div>
+            <div class="flex-1 ml-3">
+              <div class="text-lg font-semibold">vs ${match.opponent}</div>
+              <div class="text-muted-foreground text-sm">Partita #${match.matchNumber}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-2xl font-bold">${match.playerScore}-${match.opponentScore}</div>
+              <div class="text-sm font-semibold px-2 py-1 rounded ${eloChangeClass}">${eloChangeText}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      return `
+        <date-group-header date="${dateKey}"></date-group-header>
+        <div class="bg-card rounded-xl shadow-md overflow-hidden mb-2">
+          <div class="divide-y divide-border">
+            ${matchesHTML}
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 }
 
